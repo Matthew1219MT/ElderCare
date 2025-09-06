@@ -1,6 +1,7 @@
 package com.eldercare.eldercare;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.eldercare.eldercare.BuildConfig;
@@ -89,6 +90,13 @@ public class AIDoctor extends AppCompatActivity {
                 return headers;
             }
         };
-        queue.add(request);
+
+        Button btn = findViewById(R.id.ai_doctor_btn);
+        btn.setOnClickListener(v -> {
+            if (data != null) {
+                data.setText("Loading...");
+                queue.add(request);
+            }
+        });
     }
 }

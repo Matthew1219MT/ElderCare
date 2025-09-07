@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Eldercare</string>
+    <string name="request_emgy_svc_btn">Request Emergency Service</string>
+    <string name="emgy_svcs_label">Available Emergency Services Nearby</string>
 </resources>

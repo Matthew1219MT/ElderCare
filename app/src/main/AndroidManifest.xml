@@ -12,7 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Eldercare">
         <activity
-            android:name=".AIDoctor"
+            android:name=".MainActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".ViewModel.VM_AIDoctor"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

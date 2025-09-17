@@ -25,7 +25,6 @@ public class VM_AIDoctor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ai_doctor);
         //Initialize views
         data = findViewById(R.id.data);

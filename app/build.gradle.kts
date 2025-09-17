@@ -77,4 +77,10 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1");
     implementation("com.google.code.gson:gson:2.11.0");
 
+    val fragment_version = "1.8.9"
+
+    // Java language implementation
+    implementation("androidx.fragment:fragment:$fragment_version")
+    // Kotlin
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }

@@ -3,23 +3,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    >
+    android:padding="22dp"
+    android:gravity="center_horizontal">
 
     <TextView
-        android:id="@+id/data"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AI Doctor"
+        android:text="Ask an AI Doctor"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="18sp" />
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/symptoms_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/edit_text"
+        android:hint="Enter your symptoms"
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:gravity="top|start"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#CCCCCC"
+        android:backgroundTintMode="src_in"
+        android:scrollbars="vertical"/>
 
     <Button
-        android:id="@+id/ai_doctor_btn"
+        android:id="@+id/send_message_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ask" />
+        android:text="Send Message"
+        android:textColor="#FFFFFF"
+        android:background="#BF5F56"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:layout_marginBottom="16dp"/>
 
+    <Button
+        android:id="@+id/attach_photo_btn"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Attach a photo"
+        android:textColor="#FFFFFF"
+        android:background="#BF5F56"
+        android:drawableStart="@android:drawable/ic_menu_camera"
+        android:drawablePadding="10dp"
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:backgroundTint="#FF0000"
+        android:backgroundTintMode="src_in"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"
+        android:clipToPadding="false"  />
 
 </LinearLayout>

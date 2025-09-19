@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000">
+
+        <!-- 3D Viewer -->
+        <android.opengl.GLSurfaceView
+            android:id="@+id/glSurfaceView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- HUD Overlay -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/gradient_overlay_top"
+            app:layout_constraintTop_toTopOf="@id/glSurfaceView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circle_button_background"
+                    android:src="@drawable/ic_arrow_back"
+                    android:contentDescription="Back"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="3D SCAN RESULT"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvScanInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Loading scan data..."
+                android:textColor="#00E5FF"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+        <!-- Rotation Controls -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/hud_panel_background"
+            android:padding="8dp"
+            app:layout_constraintTop_toTopOf="@id/glSurfaceView"
+            app:layout_constraintBottom_toBottomOf="@id/glSurfaceView"
+            app:layout_constraintEnd_toEndOf="@id/glSurfaceView">
+
+            <ImageButton
+                android:id="@+id/btnRotateUp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_button_background"
+                android:src="@drawable/ic_keyboard_arrow_up"
+                android:contentDescription="Rotate Up"
+                app:tint="#00E5FF"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <ImageButton
+                    android:id="@+id/btnRotateLeft"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circle_button_background"
+                    android:src="@drawable/ic_keyboard_arrow_left"
+                    android:contentDescription="Rotate Left"
+                    app:tint="#00E5FF"
+                    android:layout_marginEnd="4dp" />
+
+                <ImageButton
+                    android:id="@+id/btnRotateRight"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/circle_button_background"
+                    android:src="@drawable/ic_keyboard_arrow_right"
+                    android:contentDescription="Rotate Right"
+                    app:tint="#00E5FF" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnRotateDown"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_button_background"
+                android:src="@drawable/ic_keyboard_arrow_down"
+                android:contentDescription="Rotate Down"
+                app:tint="#00E5FF"
+                android:layout_marginBottom="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnReset"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_button_background"
+                android:src="@drawable/ic_refresh"
+                android:contentDescription="Reset View"
+                app:tint="#FFD700" />
+
+        </LinearLayout>
+
+        <!-- Instructions -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/hud_panel_background"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CONTROLS"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• Touch &amp; drag to rotate\n• Pinch to zoom\n• Use arrow buttons for precise control"
+                android:textColor="#00E5FF"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Control Panel -->
+        <LinearLayout
+            android:id="@+id/controlPanel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/gradient_overlay_bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:text="WIREFRAME"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:background="@drawable/secondary_button_background"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:text="SOLID"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:background="@drawable/secondary_button_background"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:text="EXPORT"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:background="@drawable/scan_button_background" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

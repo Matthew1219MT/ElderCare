@@ -24,7 +24,7 @@ android {
         buildConfigField(
             type = "String",
             name = "OPENAI_API_KEY",
-            value = properties.getProperty("OPENAI_API_KEY", "\"YOUR_DEFAULT_OR_MISSING_KEY_PLACEHOLDER\"")
+            value = properties.getProperty("OPENAI_API_KEY", "NULL")
         )
         android.buildFeatures.buildConfig = true
     }

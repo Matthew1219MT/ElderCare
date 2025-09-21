@@ -27,8 +27,8 @@ public class VM_AIDoctor extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ai_doctor);
         //Initialize views
-        data = findViewById(R.id.data);
-        btn = findViewById(R.id.ai_doctor_btn);
+        data = findViewById(R.id.title);
+        btn = findViewById(R.id.send_message_btn);
         //Initialize Model
         model = new M_AIDoctor(this);
         btn.setOnClickListener(v -> requestQuery());

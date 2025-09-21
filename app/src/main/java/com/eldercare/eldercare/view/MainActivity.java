@@ -23,20 +23,20 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Handle system bars
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.homepageLayout), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Initialize ViewModel
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-
-        // Observe LiveData from ViewModel
-        viewModel.getWelcomeText().observe(this, message -> {
-            TextView textView = findViewById(R.id.textView);
-            textView.setText(message);
-        });
+//        // Handle system bars
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.homepageLayout), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
+//
+//        // Initialize ViewModel
+//        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+//
+//        // Observe LiveData from ViewModel
+//        viewModel.getWelcomeText().observe(this, message -> {
+//            TextView textView = findViewById(R.id.title);
+//            textView.setText(message);
+//        });
     }
 }

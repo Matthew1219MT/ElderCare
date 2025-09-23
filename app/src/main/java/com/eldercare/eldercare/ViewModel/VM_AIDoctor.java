@@ -18,15 +18,17 @@ public class VM_AIDoctor extends AppCompatActivity {
     private Button btn;
     private M_AIDoctor model;
 
+    private android.os.Handler typingHandler = new android.os.Handler();
+    private Runnable typingRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ai_doctor);
         //Initialize views
-        data = findViewById(R.id.data);
-        btn = findViewById(R.id.ai_doctor_btn);
+        data = findViewById(R.id.title);
+        btn = findViewById(R.id.send_message_btn);
         //Initialize Model
         model = new M_AIDoctor(this);
         btn.setOnClickListener(v -> requestQuery());
@@ -39,14 +41,32 @@ public class VM_AIDoctor extends AppCompatActivity {
                 "Tell me a joke",
                 response -> {
                     //Success callback
-                    data.setText(response);
+                    typeText(response);
                     btn.setEnabled(true);
                 },
                 errorMessage -> {
                     //Error callback
-                    data.setText(errorMessage);
+                    typeText(errorMessage);
                     btn.setEnabled(true);
                 }
         );
+    }
+
+
+    private void typeText(String content) {
+        final int[] wordIndex = {0};
+
+        typingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (wordIndex[0] < content.length()) {
+                    String current_text = content.substring(0, wordIndex[0] + 1);
+                    data.setText(current_text);
+                    wordIndex[0]++;
+                    typingHandler.postDelayed(this, 50); // Adjust the delay as needed
+                }
+            }
+        };
+        typingHandler.post(typingRunnable);
     }
 }

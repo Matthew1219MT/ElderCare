@@ -49,7 +49,7 @@ public class M_AIDoctor {
                 OPENAI_MODEL,
                 Arrays.asList(new Message("user", query))
         );
-        String jsonBody = gson.toJson(chat_request);
+        String json_body = gson.toJson(chat_request);
         StringRequest request = new StringRequest(
             Request.Method.POST,
             OPENAI_URL,
@@ -77,7 +77,7 @@ public class M_AIDoctor {
         ) {
             @Override
             public byte[] getBody() {
-                return jsonBody.getBytes(StandardCharsets.UTF_8);
+                return json_body.getBytes(StandardCharsets.UTF_8);
             }
 
             @Override

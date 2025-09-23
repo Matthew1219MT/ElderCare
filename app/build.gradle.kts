@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 val properties = Properties()
 val localPropertiesFile = project.rootProject.file("local.properties")
@@ -23,7 +24,7 @@ android {
         buildConfigField(
             type = "String",
             name = "OPENAI_API_KEY",
-            value = properties.getProperty("OPENAI_API_KEY", "\"YOUR_DEFAULT_OR_MISSING_KEY_PLACEHOLDER\"")
+            value = properties.getProperty("OPENAI_API_KEY", "NULL")
         )
         android.buildFeatures.buildConfig = true
     }
@@ -41,6 +42,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
@@ -49,6 +53,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -77,4 +82,10 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1");
     implementation("com.google.code.gson:gson:2.11.0");
 
+    val fragment_version = "1.8.9"
+
+    // Java language implementation
+    implementation("androidx.fragment:fragment:$fragment_version")
+    // Kotlin
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }

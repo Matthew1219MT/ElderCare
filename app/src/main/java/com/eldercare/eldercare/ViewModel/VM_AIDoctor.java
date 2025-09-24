@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.ViewModel;
+package com.eldercare.eldercare.viewmodel;
 
 import android.app.Application;
 import android.os.Bundle;

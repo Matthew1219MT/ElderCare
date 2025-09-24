@@ -8,6 +8,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.eldercare.eldercare.activity.FaceScanActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView welcomeText;
@@ -33,8 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Click listeners
         facialAnalysisCard.setOnClickListener(v ->
-                        Toast.makeText(this, "Facial Analysis selected", Toast.LENGTH_SHORT).show()
-                // startActivity(new Intent(this, FacialAnalysisActivity.class));
+                 startActivity(new Intent(this, FaceScanActivity.class))
         );
 
         emergencyCard.setOnClickListener(v ->

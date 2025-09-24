@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.eldercare.eldercare.ViewModel.FaceScanViewModel" />
+            type="com.eldercare.eldercare.viewmodel.FaceScanViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

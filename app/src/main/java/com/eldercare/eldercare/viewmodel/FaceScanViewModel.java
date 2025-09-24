@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.ViewModel;
+package com.eldercare.eldercare.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

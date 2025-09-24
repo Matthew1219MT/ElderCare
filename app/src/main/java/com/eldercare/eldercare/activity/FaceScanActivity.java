@@ -16,7 +16,7 @@ import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.ar.ARFaceProcessor;
 import com.eldercare.eldercare.databinding.ActivityFaceScanBinding;
 import com.eldercare.eldercare.model.FaceScanData;
-import com.eldercare.eldercare.ViewModel.FaceScanViewModel;
+import com.eldercare.eldercare.viewmodel.FaceScanViewModel;
 import com.google.ar.core.*;
 import com.google.ar.core.exceptions.*;
 import com.karumi.dexter.Dexter;

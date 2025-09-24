@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.viewmodel;
+package com.eldercare.eldercare.ViewModel;
 
 import android.os.Bundle;
 import android.widget.Button;

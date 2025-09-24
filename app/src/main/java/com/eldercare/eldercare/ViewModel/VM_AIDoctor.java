@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.viewmodel;
+package com.eldercare.eldercare.ViewModel;
 
 import android.app.Application;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.eldercare.eldercare.model.M_AIDoctor;
+import com.eldercare.eldercare.Model.M_AIDoctor;
 import com.eldercare.eldercare.R;
 
 public class VM_AIDoctor extends AppCompatActivity {

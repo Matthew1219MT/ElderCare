@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.eldercare.eldercare.Model.M_AIDoctor;
+import com.eldercare.eldercare.model.M_AIDoctor;
 import com.eldercare.eldercare.R;
 
 public class VM_AIDoctor extends AppCompatActivity {

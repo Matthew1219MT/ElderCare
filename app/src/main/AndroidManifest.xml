@@ -72,6 +72,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.ElderCare.NoActionBar" />
 
+        <!-- Extra ViewModel test Activities -->
+        <activity
+            android:name=".viewmodel.VM_AIDoctor"
+            android:exported="true" />
+        <activity
+            android:name=".viewmodel.VM_FragmentTest"
+            android:exported="true" />
+
     </application>
 
 </manifest>

@@ -1,5 +1,14 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    properties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -14,6 +23,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            type = "String",
+            name = "OPENAI_API_KEY",
+            value = properties.getProperty("OPENAI_API_KEY", "NULL")
+        )
+        android.buildFeatures.buildConfig = true
     }
 
     buildTypes {
@@ -29,7 +44,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
+    kotlinOptions {
+        jvmTarget = "11"
+    }
     buildFeatures {
         dataBinding = true
         viewBinding = true
@@ -41,6 +58,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.core.ktx)
 
     // ARCore and Camera
     implementation(libs.arcore)
@@ -58,10 +76,19 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
+    implementation(libs.moshi)
+    implementation(libs.retrofit.moshi)
 
     // ViewModel and LiveData
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.runtime.compose)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
+    // Compose runtime-livedata
+    implementation(libs.compose.runtime.livedata)
 
     // OpenGL and 3D rendering
     implementation(libs.filament.android)
@@ -69,6 +96,13 @@ dependencies {
 
     // Permissions
     implementation(libs.dexter)
+
+    // Volley
+    implementation(libs.volley)
+
+    // Fragment
+    implementation(libs.fragment)
+    implementation(libs.fragment.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

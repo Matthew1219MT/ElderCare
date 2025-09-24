@@ -51,7 +51,7 @@
 
     <!-- Facial Analysis -->
     <androidx.cardview.widget.CardView
-        android:fontFamily="@font/font_bold"
+        android:id="@+id/facialAnalysisCard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
@@ -72,6 +72,7 @@
 
     <!-- Emergency -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/emergencyCard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
@@ -92,6 +93,7 @@
 
     <!-- AI Doctor -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/aiDoctorCard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"

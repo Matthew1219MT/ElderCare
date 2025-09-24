@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".StrokeDetectionActivity">
+
+    <!-- Menu Button (Top Left) -->
+    <Button
+        android:id="@+id/menu_button"
+        android:layout_width="29dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="21dp"
+        android:background="@drawable/menu_button_bg"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
+
+    <!-- ElderCare Title (Top Center) -->
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="ElderCare"
+        android:textSize="36sp"
+        android:fontFamily="@font/lexend_deca_extrabold"
+        android:includeFontPadding="false"
+        android:letterSpacing="0"
+        android:lineSpacingMultiplier="1.0" />
+
+    <!-- Camera Preview Container -->
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="331dp"
+        android:layout_height="598dp"
+        android:layout_below="@id/title_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp"
+        android:background="#000000">
+
+        <SurfaceView
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Camera overlay frame -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/camera_frame_overlay" />
+
+    </FrameLayout>
+
+    <!-- Hidden UI elements for capture functionality -->
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/camera_preview"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="Capture 3 images"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <!-- Take Photo Button (Bottom) -->
+    <Button
+        android:id="@+id/capture_button"
+        android:layout_width="146dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/take_photo_button_bg"
+        android:text="Take Photo"
+        android:textColor="#FFFFFF"
+        android:textSize="22.25sp"
+        android:fontFamily="@font/lexend_deca_regular"
+        android:includeFontPadding="false"
+        android:letterSpacing="0" />
+
+
+</RelativeLayout>

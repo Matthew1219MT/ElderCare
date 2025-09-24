@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 
 import com.eldercare.eldercare.Fragment.FirstFragment;
 import com.eldercare.eldercare.Fragment.SecondFragment;
-import com.eldercare.eldercare.Model.M_AIDoctor;
+import com.eldercare.eldercare.model.M_AIDoctor;
 import com.eldercare.eldercare.R;
 
 public class VM_FragmentTest extends AppCompatActivity {

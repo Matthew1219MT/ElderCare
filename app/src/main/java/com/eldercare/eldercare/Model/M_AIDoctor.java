@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.model;
+package com.eldercare.eldercare.Model;
 
 import android.content.Context;
 import android.os.Bundle;

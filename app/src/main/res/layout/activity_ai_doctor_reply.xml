@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Ask an AI Doctor"
+        android:text="AI Doctor's Reply"
         android:textAlignment="center"
         android:textColor="#8C2E2E"
         android:textSize="35sp"
@@ -49,34 +49,36 @@
         android:layout_marginTop="20dp"
         android:gravity="center" />
 
-    <!-- Symptoms textarea -->
-    <EditText
-        android:id="@+id/symptoms_input"
+    <!-- Reply -->
+    <TextView
+        android:id="@+id/disclaimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Reply"
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="24sp"
+        android:fontFamily="@font/font_regular"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="0dp"
+        android:gravity="center" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter your symptoms"
-        android:inputType="textMultiLine"
-        android:minLines="4"
-        android:gravity="top|start"
-        android:textSize="16sp"
-        android:padding="16dp"
-        android:layout_marginBottom="32dp"
-        android:scrollbars="vertical"
-        android:minHeight="250dp"
-        android:background="#FFFFFF" />
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
 
-    <!-- Send button -->
-    <Button
-        android:id="@+id/send_message_btn"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Send Message"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:backgroundTint="#BF5F56"
-        android:fontFamily="@font/font_regular"
-        android:layout_gravity="end"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="30dp" />
+        <Button
+            android:id="@+id/understand_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ask Another Question"
+            android:backgroundTint="#BF5F56"
+            android:fontFamily="@font/font_regular"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
 
 </LinearLayout>

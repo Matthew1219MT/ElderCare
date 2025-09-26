@@ -15,7 +15,8 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="8dp"
         android:src="@drawable/eldercare_textlogo"
-        android:contentDescription="ElderCare Logo" />
+        android:contentDescription="ElderCare Logo"
+        android:layout_marginTop="15dp"/>
 
     <!-- Home Section Title -->
     <TextView

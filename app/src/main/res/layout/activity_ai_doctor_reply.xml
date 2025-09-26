@@ -10,7 +10,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="15dp">
 
         <!-- Back button -->
         <ImageButton
@@ -50,19 +51,28 @@
         android:gravity="center" />
 
     <!-- Reply -->
-    <TextView
-        android:id="@+id/disclaimer"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Reply"
-        android:textAlignment="center"
-        android:textColor="#000"
-        android:textSize="24sp"
-        android:fontFamily="@font/font_regular"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="0dp"
-        android:gravity="center" />
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="vertical"
+        android:fillViewport="true"
+        android:layout_gravity="center_horizontal"
+        android:maxHeight="300dp">
+
+        <TextView
+            android:id="@+id/disclaimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reply"
+            android:textAlignment="center"
+            android:textColor="#000"
+            android:textSize="24sp"
+            android:fontFamily="@font/font_regular"
+            android:gravity="center"/>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"

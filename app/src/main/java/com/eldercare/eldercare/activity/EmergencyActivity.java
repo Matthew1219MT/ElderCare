@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.ui;
+package com.eldercare.eldercare.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -15,11 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.databinding.ActivityEmergencyBinding;
@@ -65,7 +65,7 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
     private LatLng userLocation;
     private Marker userMarker;
     private Marker hospitalMarker;
-    private List<Hospital> hospitalList = new ArrayList<>();
+    private final List<Hospital> hospitalList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,21 +123,21 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
 
         map = googleMap;
 
         locationRequest = new LocationRequest.Builder(
-                Priority.PRIORITY_HIGH_ACCURACY, 600000
+                Priority.PRIORITY_HIGH_ACCURACY, 60000
         ).build();
 
         locationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) return;
-
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                Log.d("DEBUG_LOCATION", "Got last known location first");
                 Location location = locationResult.getLastLocation();
                 if (location != null) {
+                    Log.d("DEBUG_LOCATION", "Lat: " + location.getLatitude() + ", Lng: " + location.getLongitude());
                     userLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     map.clear();
                     userMarker = map.addMarker(new MarkerOptions()
@@ -152,6 +152,7 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        Log.d("DEBUG_LOCATION", "Ready to request loc update.");
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 
     }
@@ -224,7 +225,7 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
                     JSONObject result = obj.getJSONObject("result");
                     String phone = result.optString("formatted_phone_number", null);
                     hospital.setContactNbr(phone);
-                    if(phone != null && !phone.isEmpty()){
+                    if(!phone.isEmpty()){
                         makePhoneCall(phone);
                     } else {
                         Toast.makeText(EmergencyActivity.this, "No contact number for this hospital!", Toast.LENGTH_SHORT).show();

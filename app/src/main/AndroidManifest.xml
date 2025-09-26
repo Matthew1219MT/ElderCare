@@ -80,7 +80,7 @@
 
         <!-- Emergency Activity -->
         <activity
-            android:name=".ui.EmergencyActivity"
+            android:name=".activity.EmergencyActivity"
             android:exported="true" />
 
         <!-- Extra ViewModel test Activities -->

@@ -81,6 +81,7 @@
         app:cardBackgroundColor="#BF5F56">
 
         <TextView
+            android:id="@+id/emergencyCardText"
             android:fontFamily="@font/font_bold"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

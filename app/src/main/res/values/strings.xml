@@ -1,5 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Eldercare</string>
     <string name="request_emgy_svc_btn">Request Emergency Service</string>
     <string name="emgy_svcs_label">Available Emergency Services Nearby</string>
+    <string name="app_name">ElderCare</string>
+
+    <!-- Main Activity -->
+    <string name="main_title">ELDERCARE</string>
+    <string name="main_subtitle">3D Face Scanner</string>
+    <string name="start_face_scan">START FACE SCAN</string>
+    <string name="scan_instructions">• Ensure good lighting\n• Position face in center\n• Keep device steady</string>
+
+    <!-- Face Scan Activity -->
+    <string name="face_scan_title">FACE SCAN</string>
+    <string name="scan_status_position">Position your face in the frame</string>
+    <string name="scan_status_scanning">Scanning face...</string>
+    <string name="scan_status_processing">Processing scan data...</string>
+    <string name="scan_status_completed">Scan completed successfully!</string>
+    <string name="scan_status_detected">Face detected - %d points</string>
+    <string name="scan_status_error">Error: %s</string>
+
+    <string name="btn_start_scan">START SCAN</string>
+    <string name="btn_view_result">VIEW 3D</string>
+    <string name="btn_upload">UPLOAD</string>
+    <string name="btn_back">Back</string>
+
+    <!-- Scan Result Activity -->
+    <string name="scan_result_title">3D SCAN RESULT</string>
+    <string name="scan_info_format">Scan ID: %s\nVertices: %d\nTriangles: %d</string>
+    <string name="scan_info_loading">Loading scan data...</string>
+
+    <string name="btn_rotate_up">Rotate Up</string>
+    <string name="btn_rotate_down">Rotate Down</string>
+    <string name="btn_rotate_left">Rotate Left</string>
+    <string name="btn_rotate_right">Rotate Right</string>
+    <string name="btn_reset">Reset View</string>
+
+    <string name="btn_wireframe">WIREFRAME</string>
+    <string name="btn_solid">SOLID</string>
+    <string name="btn_export">EXPORT</string>
+
+    <string name="controls_title">CONTROLS</string>
+    <string name="controls_instructions">• Touch &amp; drag to rotate\n• Pinch to zoom\n• Use arrow buttons for precise control</string>
+
+    <!-- Messages -->
+    <string name="camera_permission_required">Camera permission is required for face scanning</string>
+    <string name="arcore_required">ARCore is required for face scanning</string>
+    <string name="arcore_update_required">Please update ARCore</string>
+    <string name="app_update_required">Please update this app</string>
+    <string name="ar_session_failed">Failed to setup AR session</string>
+    <string name="camera_not_available">Camera not available</string>
+    <string name="no_scan_data">No scan data available</string>
+    <string name="face_scan_uploaded">Face scan uploaded successfully!</string>
+
+    <!-- Error Messages -->
+    <string name="error_insufficient_face_data">Insufficient face data detected. Please ensure good lighting and face the camera directly.</string>
+    <string name="error_processing_face">Failed to process face data: %s</string>
+    <string name="error_invalid_scan_data">Invalid scan data</string>
+
+    <!-- API Messages -->
+    <string name="uploading">Uploading...</string>
+    <string name="upload_successful">Upload successful</string>
+    <string name="upload_failed">Upload failed: %s</string>
+    <string name="network_error">Network error: %s</string>
+
+    <!-- Content Descriptions for Accessibility -->
+    <string name="cd_back_button">Back</string>
+    <string name="cd_rotate_up">Rotate Up</string>
+    <string name="cd_rotate_down">Rotate Down</string>
+    <string name="cd_rotate_left">Rotate Left</string>
+    <string name="cd_rotate_right">Rotate Right</string>
+    <string name="cd_reset_view">Reset View</string>
 </resources>

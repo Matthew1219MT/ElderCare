@@ -1,5 +1,14 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    properties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -14,6 +23,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            type = "String",
+            name = "OPENAI_API_KEY",
+            value = properties.getProperty("OPENAI_API_KEY", "NULL")
+        )
+        android.buildFeatures.buildConfig = true
     }
 
     buildTypes {
@@ -33,6 +48,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -41,10 +63,57 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.core.ktx)
+
+    // ARCore and Camera
+    implementation(libs.arcore)
+    implementation(libs.camera2)
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // ML Kit Face Detection
+    implementation(libs.mlkit.face.detection)
+
+    // Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
+    implementation(libs.moshi)
+    implementation(libs.retrofit.moshi)
+
+    // ViewModel and LiveData
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.runtime.compose)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
+    // Compose runtime-livedata
+    implementation(libs.compose.runtime.livedata)
+
+    // OpenGL and 3D rendering
+    implementation(libs.filament.android)
+    implementation(libs.gltfio.android)
+
+    // Permissions
+    implementation(libs.dexter)
+
+    // Volley
+    implementation(libs.volley)
+
+    // Fragment
+    implementation(libs.fragment)
+    implementation(libs.fragment.ktx)
+
     implementation(libs.play.services.location)
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("androidx.fragment:fragment:1.6.1")
     implementation("com.google.android.libraries.places:places:3.3.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

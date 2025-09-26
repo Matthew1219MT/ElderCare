@@ -34,7 +34,7 @@ public class Decrypted_VM_AIDoctor extends AppCompatActivity {
     private void requestQuery() {
         data.setText("Loading...");
         btn.setEnabled(false);
-        model.sendQuery(
+        model.askAI(
                 "Tell me a joke",
                 response -> {
                     //Success callback

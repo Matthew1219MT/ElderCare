@@ -21,7 +21,7 @@ public class F_AIDoctorQuery extends Fragment {
     private EditText query;
 
     private Button queryBtn;
-    private ImageButton back_btn;
+    private ImageButton backBtn;
 
     public F_AIDoctorQuery() {
         super(R.layout.fragment_ai_doctor_query);
@@ -32,21 +32,21 @@ public class F_AIDoctorQuery extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(VM_AIDoctor.class);
         query = view.findViewById(R.id.symptoms_input);
         query.setHint("Please enter your symptoms");
-        back_btn = view.findViewById(R.id.back_button);
-        back_btn.setOnClickListener(v->{
+        backBtn = view.findViewById(R.id.back_button);
+        backBtn.setOnClickListener(v->{
             if (getActivity() != null) {
                 getActivity().finish();
             }
         });
         queryBtn = view.findViewById(R.id.send_message_btn);
         queryBtn.setOnClickListener(v -> {
-            String queryStr = query.getText().toString();
-            if (queryStr.isEmpty()) {
+            String query_string = query.getText().toString();
+            if (query_string.isEmpty()) {
                 query.setHint("Empty Input! Please enter your symptoms");
             } else {
                 query.getText().clear();
                 query.setHint("Loading...");
-                viewModel.sendQuery(queryStr,
+                viewModel.sendQuery(query_string,
                     onSuccess -> {
                         viewModel.setReponse(onSuccess);
                         viewModel.switchFragment(VM_AIDoctor.FragmentType.Reply);

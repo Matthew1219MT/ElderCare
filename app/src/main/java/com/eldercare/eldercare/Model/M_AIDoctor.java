@@ -24,11 +24,11 @@ import java.util.Map;
 public class M_AIDoctor {
 
     //API Url
-    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String openaiURL = "https://api.openai.com/v1/chat/completions";
     //AI Model Type
-    private static final String OPENAI_MODEL = "gpt-4o-mini";
+    private static final String openaiModel = "gpt-4o-mini";
     //API KEY
-    private static final String OPENAI_API_KEY = BuildConfig.OPENAI_API_KEY;
+    private static final String openaiApiKey = BuildConfig.OPENAI_API_KEY;
 
     private final RequestQueue requestQueue;
     private final Gson gson;
@@ -62,7 +62,7 @@ public class M_AIDoctor {
 
     public void askAI(String query, OnSuccessCallBack onSuccess, OnErrorCallBack onError) {
         ChatRequest chat_request = new ChatRequest(
-                OPENAI_MODEL,
+                openaiModel,
                 List.of(
                     new Message("system", prePrompt),
                     new Message("user", query)
@@ -71,7 +71,7 @@ public class M_AIDoctor {
         String json_body = gson.toJson(chat_request);
         StringRequest request = new StringRequest(
             Request.Method.POST,
-            OPENAI_URL,
+            openaiURL,
                 responseStr -> {
                     try {
                         ChatCompletionResponse resp = gson.fromJson(responseStr, ChatCompletionResponse.class);
@@ -107,7 +107,7 @@ public class M_AIDoctor {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + OPENAI_API_KEY);
+                headers.put("Authorization", "Bearer " + openaiApiKey);
                 headers.put("Content-Type", "application/json");
                 return headers;
             }
@@ -121,15 +121,15 @@ public class M_AIDoctor {
 
             // Fixed responses based on query keywords
             String response;
-            String queryLower = query.toLowerCase();
+            String query_lower = query.toLowerCase();
 
-            if (queryLower.contains("headache") || queryLower.contains("head")) {
+            if (query_lower.contains("headache") || query_lower.contains("head")) {
                 response = "For headaches, try resting in a quiet, dark room. Stay hydrated and consider over-the-counter pain relievers if appropriate. If headaches persist or worsen, please consult a healthcare professional.";
-            } else if (queryLower.contains("fever") || queryLower.contains("temperature")) {
+            } else if (query_lower.contains("fever") || query_lower.contains("temperature")) {
                 response = "For fever, rest and stay hydrated. Monitor your temperature regularly. If fever exceeds 101.3°F (38.5°C) or persists for more than 3 days, seek medical attention immediately.";
-            } else if (queryLower.contains("cough")) {
+            } else if (query_lower.contains("cough")) {
                 response = "For persistent cough, stay hydrated, use honey (for adults), and avoid irritants. If cough lasts more than 2 weeks or is accompanied by blood, fever, or difficulty breathing, consult a doctor.";
-            } else if (queryLower.contains("stomach") || queryLower.contains("nausea")) {
+            } else if (query_lower.contains("stomach") || query_lower.contains("nausea")) {
                 response = "For stomach issues, try eating bland foods like rice, bananas, or toast. Stay hydrated with small sips of water. Avoid dairy and fatty foods. Seek medical help if symptoms persist or worsen.";
             } else {
                 response = "Thank you for your question about: '" + query + "'. This is a test response. Please consult with a healthcare professional for proper medical advice. Remember, this AI assistant is for informational purposes only.";

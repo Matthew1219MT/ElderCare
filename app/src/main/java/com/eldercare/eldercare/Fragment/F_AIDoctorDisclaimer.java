@@ -15,9 +15,10 @@ import com.eldercare.eldercare.ViewModel.VM_AIDoctor;
 
 public class F_AIDoctorDisclaimer extends Fragment {
 
-    private Button understand_btn;
+    private Button acceptBtn;
     private VM_AIDoctor viewModel;
-    private ImageButton back_btn;
+    private ImageButton backBtn;
+    private Button declineBtn;
 
     public F_AIDoctorDisclaimer() {
         super(R.layout.fragment_ai_doctor_disclaimer);
@@ -26,12 +27,18 @@ public class F_AIDoctorDisclaimer extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(VM_AIDoctor.class);
-        understand_btn = view.findViewById(R.id.understand_button);
-        understand_btn.setOnClickListener(v -> {
+        acceptBtn = view.findViewById(R.id.understand_button);
+        acceptBtn.setOnClickListener(v -> {
             viewModel.switchFragment(VM_AIDoctor.FragmentType.Query);
         });
-        back_btn = view.findViewById(R.id.back_button);
-        back_btn.setOnClickListener(v->{
+        backBtn = view.findViewById(R.id.back_button);
+        backBtn.setOnClickListener(v->{
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
+        declineBtn = view.findViewById(R.id.decline_button);
+        declineBtn.setOnClickListener(v->{
             if (getActivity() != null) {
                 getActivity().finish();
             }

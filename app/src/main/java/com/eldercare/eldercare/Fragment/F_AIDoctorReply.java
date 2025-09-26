@@ -20,7 +20,7 @@ public class F_AIDoctorReply extends Fragment {
 
     private TextView reply;
     private Button askBtn;
-    private ImageButton back_btn;
+    private ImageButton backBtn;
 
 
     private android.os.Handler typingHandler = new android.os.Handler();
@@ -40,8 +40,8 @@ public class F_AIDoctorReply extends Fragment {
             viewModel.setReponse("");
             viewModel.switchFragment(VM_AIDoctor.FragmentType.Disclaimer);
         });
-        back_btn = view.findViewById(R.id.back_button);
-        back_btn.setOnClickListener(v->{
+        backBtn = view.findViewById(R.id.back_button);
+        backBtn.setOnClickListener(v->{
             if (getActivity() != null) {
                 getActivity().finish();
             }
@@ -49,15 +49,15 @@ public class F_AIDoctorReply extends Fragment {
     }
 
     private void typeText(String content) {
-        final int[] wordIndex = {0};
+        final int[] word_index = {0};
 
         typingRunnable = new Runnable() {
             @Override
             public void run() {
-                if (wordIndex[0] < content.length()) {
-                    String current_text = content.substring(0, wordIndex[0] + 1);
+                if (word_index[0] < content.length()) {
+                    String current_text = content.substring(0, word_index[0] + 1);
                     reply.setText(current_text);
-                    wordIndex[0]++;
+                    word_index[0]++;
                     typingHandler.postDelayed(this, 50); // Adjust the delay as needed
                 }
             }

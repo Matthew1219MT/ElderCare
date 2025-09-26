@@ -8,11 +8,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.eldercare.eldercare.R;
-import com.eldercare.eldercare.viewmodel.MainViewModel;
 
 public class V_HomePage extends AppCompatActivity {
 
-    private MainViewModel viewModel;
     private CardView facialAnalysis;
     private CardView emergency;
     private CardView aiDoctor;

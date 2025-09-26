@@ -1,14 +1,9 @@
-package com.eldercare.eldercare.view;
+package com.eldercare.eldercare.View;
 
 import android.os.Bundle;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.viewmodel.MainViewModel;

@@ -17,7 +17,7 @@
             android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_back"
+            android:src="@drawable/ic_menu_back"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back"
             android:layout_alignParentStart="true"
@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Disclaimer"
+        android:text="AI Doctor's Reply"
         android:textAlignment="center"
         android:textColor="#8C2E2E"
         android:textSize="35sp"
@@ -49,13 +49,13 @@
         android:layout_marginTop="20dp"
         android:gravity="center" />
 
-    <!-- Disclaimer -->
+    <!-- Reply -->
     <TextView
         android:id="@+id/disclaimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="ElderCare AI uses open-source AI technology to provide quick health advice. This feature is not a substitute for professional medical care. ElderCare is not liable for decisions made based on this tool. Always consult a qualified healthcare professional for medical concerns."
+        android:text="Reply"
         android:textAlignment="center"
         android:textColor="#000"
         android:textSize="24sp"
@@ -71,21 +71,11 @@
         android:layout_marginTop="20dp">
 
         <Button
-            android:id="@+id/decline_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Decline"
-            android:backgroundTint="#BF5F56"
-            android:fontFamily="@font/font_regular"
-            android:layout_marginEnd="8dp"/>
-
-        <Button
             android:id="@+id/understand_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Accept"
+            android:text="Ask Another Question"
             android:backgroundTint="#BF5F56"
             android:fontFamily="@font/font_regular"
             android:layout_marginStart="8dp"/>

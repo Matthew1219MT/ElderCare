@@ -3,6 +3,7 @@ package com.eldercare.eldercare.Fragment;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,8 @@ public class F_AIDoctorReply extends Fragment {
 
     private TextView reply;
     private Button askBtn;
+    private ImageButton back_btn;
+
 
     private android.os.Handler typingHandler = new android.os.Handler();
     private Runnable typingRunnable;
@@ -36,6 +39,12 @@ public class F_AIDoctorReply extends Fragment {
         askBtn.setOnClickListener(v -> {
             viewModel.setReponse("");
             viewModel.switchFragment(VM_AIDoctor.FragmentType.Disclaimer);
+        });
+        back_btn = view.findViewById(R.id.back_button);
+        back_btn.setOnClickListener(v->{
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
         });
     }
 

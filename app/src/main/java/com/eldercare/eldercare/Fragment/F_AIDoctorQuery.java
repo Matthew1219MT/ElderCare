@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ public class F_AIDoctorQuery extends Fragment {
     private EditText query;
 
     private Button queryBtn;
+    private ImageButton back_btn;
 
     public F_AIDoctorQuery() {
         super(R.layout.fragment_ai_doctor_query);
@@ -30,6 +32,12 @@ public class F_AIDoctorQuery extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(VM_AIDoctor.class);
         query = view.findViewById(R.id.symptoms_input);
         query.setHint("Please enter your symptoms");
+        back_btn = view.findViewById(R.id.back_button);
+        back_btn.setOnClickListener(v->{
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
         queryBtn = view.findViewById(R.id.send_message_btn);
         queryBtn.setOnClickListener(v -> {
             String queryStr = query.getText().toString();

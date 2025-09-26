@@ -1,72 +1,55 @@
 package com.eldercare.eldercare.ViewModel;
 
 import android.app.Application;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TextView;
+import android.content.Context;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.eldercare.eldercare.Model.M_AIDoctor;
-import com.eldercare.eldercare.R;
 
-public class VM_AIDoctor extends AppCompatActivity {
-    private TextView data;
-    private Button btn;
-    private M_AIDoctor model;
+import java.util.function.Consumer;
 
-    private android.os.Handler typingHandler = new android.os.Handler();
-    private Runnable typingRunnable;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_ai_doctor);
-        //Initialize views
-        data = findViewById(R.id.title);
-        btn = findViewById(R.id.send_message_btn);
-        //Initialize Model
-        model = new M_AIDoctor(this);
-        btn.setOnClickListener(v -> requestQuery());
+public class VM_AIDoctor extends AndroidViewModel {
+    public enum FragmentType {
+        Disclaimer,
+        Query,
+        Reply
     }
 
-    private void requestQuery() {
-        data.setText("Loading...");
-        btn.setEnabled(false);
-        model.sendQuery(
-                "Tell me a joke",
-                response -> {
-                    //Success callback
-                    typeText(response);
-                    btn.setEnabled(true);
-                },
-                errorMessage -> {
-                    //Error callback
-                    typeText(errorMessage);
-                    btn.setEnabled(true);
-                }
+    private M_AIDoctor model;
+    private MutableLiveData<FragmentType> currentFragment = new MutableLiveData<>();
+    private String response = "";
+    public VM_AIDoctor(@NonNull Application application) {
+        super(application);
+        currentFragment.setValue(FragmentType.Disclaimer);
+        model = new M_AIDoctor(application.getApplicationContext());
+    }
+
+    public LiveData<FragmentType> getCurrentFragment() {
+        return currentFragment;
+    }
+
+    public void switchFragment(FragmentType fragment) {
+        currentFragment.setValue(fragment);
+    }
+
+    public void sendQuery(String query, Consumer<String> onSuccess , Consumer<String> onError) {
+        model.askAITest(
+            query,
+            onSuccess::accept,
+            onError::accept
         );
     }
 
+    public void setReponse(String r) {
+        response = r;
+    }
 
-    private void typeText(String content) {
-        final int[] wordIndex = {0};
-
-        typingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (wordIndex[0] < content.length()) {
-                    String current_text = content.substring(0, wordIndex[0] + 1);
-                    data.setText(current_text);
-                    wordIndex[0]++;
-                    typingHandler.postDelayed(this, 50); // Adjust the delay as needed
-                }
-            }
-        };
-        typingHandler.post(typingRunnable);
+    public String getResponse() {
+        return response;
     }
 }

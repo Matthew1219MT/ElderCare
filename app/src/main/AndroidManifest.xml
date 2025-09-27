@@ -49,7 +49,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".view.V_HomePage"
             android:exported="true"
             android:theme="@style/Theme.ElderCare">
             <intent-filter>
@@ -72,14 +72,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.ElderCare.NoActionBar" />
 
-        <!-- Extra ViewModel test Activities -->
         <activity
-            android:name=".viewmodel.VM_AIDoctor"
-            android:exported="true" />
-        <activity
-            android:name=".viewmodel.VM_FragmentTest"
-            android:exported="true" />
-
+            android:name=".view.V_AIDoctor"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

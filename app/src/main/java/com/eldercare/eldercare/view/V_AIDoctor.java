@@ -1,17 +1,16 @@
-package com.eldercare.eldercare.View;
+package com.eldercare.eldercare.view;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.eldercare.eldercare.Fragment.F_AIDoctorDisclaimer;
-import com.eldercare.eldercare.Fragment.F_AIDoctorQuery;
-import com.eldercare.eldercare.Fragment.F_AIDoctorReply;
+import com.eldercare.eldercare.fragment.F_AIDoctorDisclaimer;
+import com.eldercare.eldercare.fragment.F_AIDoctorQuery;
+import com.eldercare.eldercare.fragment.F_AIDoctorReply;
 import com.eldercare.eldercare.R;
-import com.eldercare.eldercare.ViewModel.VM_AIDoctor;
+import com.eldercare.eldercare.viewmodel.VM_AIDoctor;
 
 public class V_AIDoctor extends AppCompatActivity {
 

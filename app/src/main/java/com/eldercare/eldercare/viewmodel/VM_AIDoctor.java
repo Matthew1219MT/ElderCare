@@ -1,16 +1,12 @@
-package com.eldercare.eldercare.ViewModel;
+package com.eldercare.eldercare.viewmodel;
 
 import android.app.Application;
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.eldercare.eldercare.model.M_AIDoctor;
-import com.eldercare.eldercare.R;
 
 import java.util.function.Consumer;
 

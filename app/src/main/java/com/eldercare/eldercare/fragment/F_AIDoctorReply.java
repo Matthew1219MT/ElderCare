@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.Fragment;
+package com.eldercare.eldercare.fragment;
 
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.eldercare.eldercare.R;
-import com.eldercare.eldercare.ViewModel.VM_AIDoctor;
+import com.eldercare.eldercare.viewmodel.VM_AIDoctor;
 
 public class F_AIDoctorReply extends Fragment {
 

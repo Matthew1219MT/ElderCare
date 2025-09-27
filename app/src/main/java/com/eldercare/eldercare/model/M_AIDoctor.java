@@ -1,7 +1,6 @@
 package com.eldercare.eldercare.model;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -16,7 +15,6 @@ import com.eldercare.eldercare.data.Message;
 import com.google.gson.Gson;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +135,7 @@ public class M_AIDoctor {
 
             // Simulate success callback
             onSuccess.onSuccess(response);
-
+            onError.onError("Test method error");
         }, 1500); // 1.5 second delay to simulate network request
     }
 }

@@ -49,7 +49,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".View.V_HomePage"
+            android:name=".view.V_HomePage"
             android:exported="true"
             android:theme="@style/Theme.ElderCare">
             <intent-filter>
@@ -73,7 +73,7 @@
             android:theme="@style/Theme.ElderCare.NoActionBar" />
 
         <activity
-            android:name=".View.V_AIDoctor"
+            android:name=".view.V_AIDoctor"
             android:exported="true">
         </activity>
     </application>

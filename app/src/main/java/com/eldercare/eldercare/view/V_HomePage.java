@@ -1,4 +1,4 @@
-package com.eldercare.eldercare.View;
+package com.eldercare.eldercare.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,12 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.eldercare.eldercare.R;
+import com.eldercare.eldercare.activity.FaceScanActivity;
 
 public class V_HomePage extends AppCompatActivity {
 
-    private CardView facialAnalysis;
-    private CardView emergency;
-    private CardView aiDoctor;
+    private CardView facialAnalysis, emergency, aiDoctor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,13 +23,14 @@ public class V_HomePage extends AppCompatActivity {
         emergency = findViewById(R.id.emergency_btn);
         aiDoctor = findViewById(R.id.ai_doctor_btn);
         facialAnalysis.setOnClickListener(v->{
-            //Logic for opening facial analysis activity
+            Intent intent = new Intent(this, FaceScanActivity.class);
+            startActivity(intent);
         });
         emergency.setOnClickListener(v->{
             //Logic for opening emergency activity
         });
         aiDoctor.setOnClickListener(v->{
-            Intent intent = new Intent(V_HomePage.this, V_AIDoctor.class);
+            Intent intent = new Intent(this, V_AIDoctor.class);
             startActivity(intent);
         });
     }

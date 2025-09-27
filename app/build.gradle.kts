@@ -4,11 +4,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
+
 val properties = Properties()
 val localPropertiesFile = project.rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     properties.load(localPropertiesFile.inputStream())
 }
+
 android {
     namespace = "com.eldercare.eldercare"
     compileSdk = 36
@@ -45,47 +47,64 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
+    }
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.core.ktx)
+
+    // ARCore and Camera
+    implementation(libs.arcore)
+    implementation(libs.camera2)
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // ML Kit Face Detection
+    implementation(libs.mlkit.face.detection)
+
+    // Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
+    implementation(libs.moshi)
+    implementation(libs.retrofit.moshi)
+
+    // ViewModel and LiveData
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.runtime.compose)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
+    // Compose runtime-livedata
+    implementation(libs.compose.runtime.livedata)
+
+    // OpenGL and 3D rendering
+    implementation(libs.filament.android)
+    implementation(libs.gltfio.android)
+
+    // Permissions
+    implementation(libs.dexter)
+
+    // Volley
+    implementation(libs.volley)
+
+    // Fragment
+    implementation(libs.fragment)
+    implementation(libs.fragment.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0");
-    // LiveData (Optional, can use StateFlow instead)
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0");
-    // Coroutines for background tasks
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3");
-    // For network requests (Example: Retrofit and Moshi/Gson)
-    implementation("com.squareup.retrofit2:retrofit:2.9.0");
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0"); // Or converter-gson
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0"); // If using Moshi
-    // OkHttp (Retrofit's underlying HTTP client, often needed for logging interceptors)
-    implementation("com.squareup.okhttp3:okhttp:4.11.0");
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0"); // For logging network requests
-
-    // Jetpack Compose (if you're using it for UI)
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.3"); // To observe LiveData in Compose
-    // or
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0"); // To collect StateFlow in Compose
-
-    // Material Components for Button (if using XML)
-    implementation("com.google.android.material:material:1.11.0");
-    implementation("com.android.volley:volley:1.2.1");
-    implementation("com.google.code.gson:gson:2.11.0");
-
-    val fragment_version = "1.8.9"
-
-    // Java language implementation
-    implementation("androidx.fragment:fragment:$fragment_version")
-    // Kotlin
-    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }

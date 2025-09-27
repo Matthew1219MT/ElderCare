@@ -1,9 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Eldercare" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <!-- Base application theme -->
+    <style name="Theme.ElderCare" parent="Theme.Material3.DayNight">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">#00E5FF</item>
+        <item name="colorPrimaryVariant">#0091EA</item>
+        <item name="colorOnPrimary">#000000</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">#03DAC5</item>
+        <item name="colorSecondaryVariant">#018786</item>
+        <item name="colorOnSecondary">#000000</item>
+
+        <!-- Error color -->
+        <item name="colorError">#CF6679</item>
+        <item name="colorOnError">#000000</item>
+
+        <!-- Background colors -->
+        <item name="android:colorBackground">#000000</item>
+        <item name="colorOnBackground">#FFFFFF</item>
+
+        <!-- Surface colors -->
+        <item name="colorSurface">#121212</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+
+        <!-- Navigation bar -->
+        <item name="android:navigationBarColor">#000000</item>
+
+        <!-- Window background -->
+        <item name="android:windowBackground">#000000</item>
+
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#B3FFFFFF</item>
     </style>
 
-    <style name="Theme.Eldercare" parent="Base.Theme.Eldercare" />
+    <!-- Theme for activities without action bar -->
+    <style name="Theme.ElderCare.NoActionBar" parent="Theme.ElderCare">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
+    </style>
+
 </resources>

@@ -1,83 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#D9D4CC"
-    android:padding="22dp">
-
-    <RelativeLayout
+    >
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="15dp">
-
-        <!-- Back button -->
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_back"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:layout_alignParentStart="true"
-            app:tint="#000000" />
-
-        <!-- Logo -->
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/eldercare_textlogo"
-            android:contentDescription="ElderCare Logo"
-            android:layout_centerInParent="true" />
-
-    </RelativeLayout>
-
-    <!-- Title -->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Ask an AI Doctor"
-        android:textAlignment="center"
-        android:textColor="#8C2E2E"
-        android:textSize="35sp"
-        android:fontFamily="@font/font_extrabold"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center" />
-
-    <!-- Symptoms textarea -->
-    <EditText
-        android:id="@+id/symptoms_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter your symptoms"
-        android:inputType="textMultiLine"
-        android:minLines="4"
-        android:gravity="top|start"
-        android:textSize="16sp"
-        android:padding="16dp"
-        android:layout_marginBottom="32dp"
-        android:scrollbars="vertical"
-        android:minHeight="250dp"
-        android:background="#FFFFFF" />
-
-    <!-- Send button -->
-    <Button
-        android:id="@+id/send_message_btn"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Send Message"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:backgroundTint="#BF5F56"
-        android:fontFamily="@font/font_regular"
-        android:layout_gravity="end"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="30dp" />
-
-</LinearLayout>
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.802" />
+</androidx.constraintlayout.widget.ConstraintLayout>

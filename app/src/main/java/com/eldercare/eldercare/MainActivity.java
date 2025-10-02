@@ -80,6 +80,18 @@ public class MainActivity extends AppCompatActivity {
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_fall_detect_bg);
         dialog.show();
 
+        android.os.Handler handler = new android.os.Handler();
+        Runnable autoLaunch = () -> {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        };
+
+        handler.postDelayed(autoLaunch, 10_000);
+
         Button cancelBtn = dialogView.findViewById(R.id.fall_detect_cancel_btn);
         Button confirmBtn = dialogView.findViewById(R.id.fall_detect_confirm_btn);
 

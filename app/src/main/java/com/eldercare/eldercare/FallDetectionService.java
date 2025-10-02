@@ -176,9 +176,10 @@ public class FallDetectionService extends Service implements SensorEventListener
 
         // 1️⃣ First notification (tap = open, dismiss = nothing, autoCancel enabled)
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "fall_channel")
-                .setSmallIcon(R.drawable.warning)
                 .setContentTitle("Fall Detected")
                 .setContentText("A fall has been detected!")
+                .setSmallIcon(R.drawable.eldercare_notif_small_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),R.drawable.eldercare_icon))
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
@@ -191,9 +192,10 @@ public class FallDetectionService extends Service implements SensorEventListener
         // Schedule auto-launch in 10 seconds if no action
         autoLaunchRunnable = () -> {
             NotificationCompat.Builder updatedBuilder = new NotificationCompat.Builder(this, "fall_channel")
-                    .setSmallIcon(R.drawable.warning)
                     .setContentTitle("Fall Detected")
                     .setContentText("No response detected! Opening app...")
+                    .setSmallIcon(R.drawable.eldercare_notif_small_icon)
+                    .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),R.drawable.eldercare_icon))
                     .setFullScreenIntent(activityPendingIntent, true)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)

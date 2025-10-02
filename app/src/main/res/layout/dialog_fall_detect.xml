@@ -10,7 +10,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#D9D4CC">
 
         <LinearLayout
             android:id="@+id/warningHeader"
@@ -18,7 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="5dp"
-            android:background="#EED202"
+            android:background="#BF5F56"
             android:gravity="center_horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -49,13 +50,14 @@
             android:id="@+id/warning_descript_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ElderCare has detected a fall, please cancel in the next 5 seconds or an emergency response will be triggered"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginTop="4dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="16dp"
+            android:text="ElderCare has detected a fall, please cancel in the next 10 seconds or an emergency response will be triggered"
+            android:textColor="@color/black"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@id/warningHeader"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@id/warningHeader"
             app:layout_constraintTop_toBottomOf="@id/warningHeader" />
 
@@ -72,10 +74,10 @@
                 android:id="@+id/fall_detect_cancel_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="#D9D4CC"
                 android:textColor="@color/black"
                 android:textSize="24sp"
-                android:text="Cancel"
+                android:text="CANCEL"
                 android:padding="2dp"
                 android:layout_weight="1"
                 android:layout_marginStart="12dp"
@@ -89,7 +91,7 @@
                 android:id="@+id/fall_detect_confirm_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#EED202"
+                android:backgroundTint="#284259"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:padding="2dp"
@@ -97,7 +99,7 @@
                 android:layout_marginEnd="12dp"
                 android:layout_marginBottom="24dp"
                 android:layout_weight="1"
-                android:text="Confirm"
+                android:text="CONFIRM"
                 app:cornerRadius="4dp" />
         </LinearLayout>
 

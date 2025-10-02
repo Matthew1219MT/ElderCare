@@ -141,7 +141,6 @@ public class FallDetectionService extends Service implements SensorEventListener
 
     private void sendFallNotification() {
         cancelAutoLaunch();
-        Bitmap bitmap_image = BitmapFactory.decodeResource(this.getResources(),R.drawable.bmp_24);
 
         // Check if app is in foreground
         if (isAppInForeground()) {
@@ -178,7 +177,6 @@ public class FallDetectionService extends Service implements SensorEventListener
         // 1️⃣ First notification (tap = open, dismiss = nothing, autoCancel enabled)
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "fall_channel")
                 .setSmallIcon(R.drawable.warning)
-                .setLargeIcon(bitmap_image)
                 .setContentTitle("Fall Detected")
                 .setContentText("A fall has been detected!")
                 .setDefaults(NotificationCompat.DEFAULT_ALL)

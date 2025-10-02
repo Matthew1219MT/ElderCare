@@ -1,12 +1,9 @@
-package com.eldercare.eldercare;
+package com.eldercare.eldercare.view;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,30 +12,68 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
-public class MainActivity extends AppCompatActivity {
+import com.eldercare.eldercare.R;
+import com.eldercare.eldercare.activity.FaceScanActivity;
+import com.eldercare.eldercare.service.FallDetectionService;
+import com.eldercare.eldercare.viewmodel.VM_HomePage;
 
-    private static final String CHANNEL_ID = "1";
+public class V_HomePage extends AppCompatActivity {
+
+    private CardView facialAnalysis, emergency, aiDoctor;
+    private VM_HomePage viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        facialAnalysis = findViewById(R.id.facial_analysis_btn);
+        emergency = findViewById(R.id.emergency_btn);
+        aiDoctor = findViewById(R.id.ai_doctor_btn);
+        facialAnalysis.setOnClickListener(v->{
+            Intent intent = new Intent(this, FaceScanActivity.class);
+            startActivity(intent);
+        });
+        emergency.setOnClickListener(v->{
+            //Logic for opening emergency activity
+        });
+        aiDoctor.setOnClickListener(v->{
+            Intent intent = new Intent(this, V_AIDoctor.class);
+            startActivity(intent);
         });
 
-        Button testFallDetectButton = findViewById(R.id.test_fall_detect_btn);
-        testFallDetectButton.setOnClickListener(v -> {showFallDetectDialog();});
+        viewModel = new ViewModelProvider(this).get(VM_HomePage.class);
+        observeViewModel();
+        checkNotificationPermissions();
+        viewModel.handleIntent(getIntent());
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        viewModel.handleIntent(intent);
+    }
+
+    private void observeViewModel() {
+        viewModel.showFallDialog.observe(this, show -> {
+            if (show) showFallDetectDialog();
+        });
+
+        viewModel.startFallService.observe(this, start -> {
+            if (start) {
+                Intent serviceIntent = new Intent(this, FallDetectionService.class);
+                ContextCompat.startForegroundService(this, serviceIntent);
+            }
+        });
+    }
+
+    private void checkNotificationPermissions(){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -47,24 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     100
             );
         } else {
-            Intent serviceIntent = new Intent(this, FallDetectionService.class);
-            ContextCompat.startForegroundService(this, serviceIntent);
-        }
-
-        if (getIntent().getBooleanExtra("SHOW_DIALOG", false)) {
-            // cancel the pending auto-launch if any
-            FallDetectionService.cancelAutoLaunch();
-            android.util.Log.d("ShowDialogAfterTap", "Auto-launch cancelled");
-            showFallDetectDialog();
-        }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent); // update intent
-        if (intent.getBooleanExtra("SHOW_DIALOG", false)) {
-            showFallDetectDialog();
+            viewModel.onPermissionGranted();
         }
     }
 
@@ -84,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         Runnable autoLaunch = () -> {
             if (dialog.isShowing()) {
                 dialog.dismiss();
-                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                Intent intent = new Intent(this, SecondActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -96,16 +114,12 @@ public class MainActivity extends AppCompatActivity {
         Button confirmBtn = dialogView.findViewById(R.id.fall_detect_confirm_btn);
 
         cancelBtn.setOnClickListener(v -> {
-            Toast.makeText(dialog.getContext(), "Closing Fall Detection Warning", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
 
+        //TO BE REPLACED WITH EMERGENCY ACTIVITY
         confirmBtn.setOnClickListener(v -> {
-            Toast.makeText(dialog.getContext(), "Confirming Emergency Responses", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
     }
-
 }
-
-          

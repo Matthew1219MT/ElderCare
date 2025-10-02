@@ -1,8 +1,10 @@
-package com.eldercare.eldercare;
+package com.eldercare.eldercare.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.eldercare.eldercare.service.FallDetectionService;
 
 public class NotificationDismissReceiver extends BroadcastReceiver {
     @Override

@@ -1,12 +1,11 @@
-package com.eldercare.eldercare;
+package com.eldercare.eldercare.view;
 
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.eldercare.eldercare.R;
 
 public class SecondActivity extends AppCompatActivity {
 

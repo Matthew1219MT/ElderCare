@@ -51,7 +51,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="ElderCare has detected a fall, please cancel in the next 10 seconds or an emergency response will be triggered"
             android:textColor="@color/black"

@@ -7,6 +7,12 @@
     <string name="main_subtitle">3D Face Scanner</string>
     <string name="start_face_scan">START FACE SCAN</string>
     <string name="scan_instructions">• Ensure good lighting\n• Position face in center\n• Keep device steady</string>
+    <string name="channel_name">fall_detection_channel</string>
+    <string name="channel_description">A channel to display a notification when a fall has occured</string>
+    <string name="opening_notif_title">Fall Detection Active</string>
+    <string name="opening_notif_content">Eldercare will monitor for falls in the background</string>
+    <string name="fall_detect_notif_title">Fall Detected!</string>
+    <string name="fall_detect_notif_content">Please press on this notification to open Eldercare or dismiss if this is a false fall trigger.</string>
 
     <!-- Face Scan Activity -->
     <string name="face_scan_title">FACE SCAN</string>

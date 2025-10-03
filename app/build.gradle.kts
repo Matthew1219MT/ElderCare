@@ -26,7 +26,7 @@ android {
         buildConfigField(
             type = "String",
             name = "OPENAI_API_KEY",
-            value = properties.getProperty("OPENAI_API_KEY", "NULL")
+            value = properties.getProperty("OPENAI_API_KEY", "null")
         )
         android.buildFeatures.buildConfig = true
     }

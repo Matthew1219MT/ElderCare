@@ -24,7 +24,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.eldercare.eldercare.MainActivity;
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.activity.EmergencyActivity;
 import com.eldercare.eldercare.activity.FaceScanActivity;

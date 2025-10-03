@@ -44,6 +44,7 @@ public class F_AIDoctorQuery extends Fragment {
             if (query_string.isEmpty()) {
                 query.setHint("Empty Input! Please enter your symptoms");
             } else {
+                queryBtn.setVisibility(View.GONE);
                 query.getText().clear();
                 query.setHint("Loading...");
                 viewModel.sendQuery(query_string,

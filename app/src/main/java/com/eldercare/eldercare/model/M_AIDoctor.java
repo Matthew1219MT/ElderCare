@@ -135,7 +135,7 @@ public class M_AIDoctor {
 
             // Simulate success callback
             onSuccess.onSuccess(response);
-            onError.onError("Test method error");
+            //onError.onError("Test method error");
         }, 1500); // 1.5 second delay to simulate network request
     }
 }

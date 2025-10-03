@@ -34,7 +34,7 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
     private static final String TAG = "FaceScanActivity";
 
     private ActivityFaceScanBinding binding;
-    private FaceScanViewModel viewModel;
+    private com.eldercare.eldercare.viewmodel.FaceScanViewModel viewModel;
     private ARFaceProcessor faceProcessor;
 
     private Session arSession;

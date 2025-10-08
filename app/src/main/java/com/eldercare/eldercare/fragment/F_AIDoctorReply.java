@@ -34,7 +34,6 @@ public class F_AIDoctorReply extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(VM_AIDoctor.class);
         reply = view.findViewById(R.id.reply);
-        typeText(viewModel.getResponse());
         askBtn = view.findViewById(R.id.ask_btn);
         askBtn.setOnClickListener(v -> {
             viewModel.setReponse("");
@@ -46,11 +45,12 @@ public class F_AIDoctorReply extends Fragment {
                 getActivity().finish();
             }
         });
+        typeText(viewModel.getResponse());
     }
 
     private void typeText(String content) {
         final int[] word_index = {0};
-
+        askBtn.setVisibility(View.GONE);
         typingRunnable = new Runnable() {
             @Override
             public void run() {
@@ -59,6 +59,8 @@ public class F_AIDoctorReply extends Fragment {
                     reply.setText(current_text);
                     word_index[0]++;
                     typingHandler.postDelayed(this, 50); // Adjust the delay as needed
+                } else {
+                    askBtn.setVisibility(View.VISIBLE);
                 }
             }
         };

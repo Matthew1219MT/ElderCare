@@ -68,7 +68,7 @@
             android:name=".view.V_HomePage"
             android:showOnLockScreen="true"
             android:exported="true"
-            android:theme="@style/Theme.ElderCare">
+            android:theme="@style/Theme.ElderCare.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -92,17 +92,20 @@
         <!-- Emergency Activity -->
         <activity
             android:name=".activity.EmergencyActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.ElderCare.NoActionBar"/>
 
         <!-- Extra ViewModel test Activities -->
         <activity
             android:name=".view.V_AIDoctor"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.ElderCare.NoActionBar">
         </activity>
 
         <activity
             android:name=".view.SecondActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.ElderCare.NoActionBar">
         </activity>
 
         <!-- Fall Detection Service -->

@@ -3,6 +3,7 @@ package com.eldercare.eldercare.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.databinding.ActivityEmergencyBinding;
@@ -66,6 +68,7 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
     private Marker userMarker;
     private Marker hospitalMarker;
     private final List<Hospital> hospitalList = new ArrayList<>();
+    private int selectedIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,6 +258,12 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
             card.setRadius(12f);
             card.setCardElevation(8f);
 
+            if (i == selectedIndex) {
+                card.setCardBackgroundColor(ContextCompat.getColor(this, R.color.eldercare_primary));
+            } else {
+                card.setCardBackgroundColor(Color.WHITE);
+            }
+
             LinearLayout layout = new LinearLayout(this);
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setPadding(24, 24, 24, 24);
@@ -270,8 +279,14 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
 
             Button button = new Button(this);
             button.setText("View on Map");
+            button.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.teal_700));
+            button.setTextColor(Color.WHITE);
             int finalI = i;
-            button.setOnClickListener(v -> focusHospitalOnMap(finalI));
+            button.setOnClickListener(v -> {
+                selectedIndex = finalI;
+                focusHospitalOnMap(finalI);
+                showHospitalCards();
+            });
 
             layout.addView(nameView);
             layout.addView(addressView);

@@ -3,6 +3,7 @@ package com.eldercare.eldercare.model;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,18 +32,7 @@ public class M_AIDoctor {
     private final RequestQueue requestQueue;
     private final Gson gson;
 
-    private final String prePrompt = "You are an AI Doctor prototype designed to help users analyze possible conditions based on their reported symptoms.\n\n"
-            + "Your goals are:\n"
-            + "1. Symptom Analysis: Collect and analyze the user’s described symptoms. Ask clarifying questions if needed (e.g., onset, duration, severity, accompanying factors).\n"
-            + "2. Differential Diagnosis: Provide a list of possible conditions, ranked by likelihood or grouped by severity (common/benign vs. serious/urgent).\n"
-            + "3. Explanations: Give clear, medically accurate explanations of why each condition might be relevant, based on the symptoms provided.\n"
-            + "4. Red Flags: Highlight urgent warning signs and recommend seeking professional medical care if symptoms suggest a potentially serious condition.\n"
-            + "5. Limitations: Always remind the user that you are not a licensed physician, your output is for informational purposes only, and you cannot provide a definitive medical diagnosis or prescribe treatment.\n\n"
-            + "Response Format:\n"
-            + "- Symptom Summary: Restate the user’s key symptoms concisely.\n"
-            + "- Possible Explanations: Provide a structured list of conditions or categories.\n"
-            + "- Next Steps: Suggest what the user could do (e.g., lifestyle tips, when to see a doctor, urgent signs to monitor).\n"
-            + "- Disclaimer: Always include a clear disclaimer about not replacing professional medical advice.\n";
+    private final String prePrompt = "You are an AI Doctor prototype designed to help elders analyze possible conditions based on their reported symptoms. Keep your answers short and simple.";
 
     //Callback Interfaces
     public interface OnSuccessCallBack {
@@ -70,7 +60,7 @@ public class M_AIDoctor {
         StringRequest request = new StringRequest(
             Request.Method.POST,
             openaiURL,
-                responseStr -> {
+        responseStr -> {
                     try {
                         ChatCompletionResponse resp = gson.fromJson(responseStr, ChatCompletionResponse.class);
                         String reply = null;
@@ -90,7 +80,13 @@ public class M_AIDoctor {
                         onError.onError("Error parsing response: " + e.getMessage());
                     }
                 },
-                error -> onError.onError("Error Fetching Result: " + error.getMessage())
+            error -> {
+                    Log.e("M_AIDoctor", "Full error: " + error.toString());
+                    if (error.networkResponse != null) {
+                        Log.e("M_AIDoctor", "Status code: " + error.networkResponse.statusCode);
+                        Log.e("M_AIDoctor", "Response: " + new String(error.networkResponse.data));
+                    }
+                    onError.onError("Error Fetching Result: " + new String(error.networkResponse.data));}
         ) {
             @Override
             public byte[] getBody() {
@@ -135,7 +131,7 @@ public class M_AIDoctor {
 
             // Simulate success callback
             onSuccess.onSuccess(response);
-            onError.onError("Test method error");
+            //onError.onError("Test method error");
         }, 1500); // 1.5 second delay to simulate network request
     }
 }

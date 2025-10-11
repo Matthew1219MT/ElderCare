@@ -75,6 +75,7 @@ dependencies {
 
     // ML Kit Face Detection
     implementation(libs.mlkit.face.detection)
+    implementation(libs.mlkit.face.mesh)  // ADDED - Critical for 3D face mesh
 
     // Networking
     implementation(libs.retrofit)

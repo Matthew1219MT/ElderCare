@@ -32,10 +32,10 @@
         android:name="android.hardware.camera.front"
         android:required="true" />
 
-    <!-- ARCore requirements -->
+    <!-- ARCore requirements - CHANGED TO OPTIONAL -->
     <uses-feature
         android:name="android.hardware.camera.ar"
-        android:required="true" />
+        android:required="false" />
 
     <!-- OpenGL ES 2.0 requirement -->
     <uses-feature
@@ -54,10 +54,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- ARCore metadata -->
+        <!-- ARCore metadata - CHANGED TO OPTIONAL -->
         <meta-data
             android:name="com.google.ar.core"
-            android:value="required" />
+            android:value="optional" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

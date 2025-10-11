@@ -18,6 +18,7 @@ gson = "2.11.0"
 moshi = "1.15.0"
 lifecycle = "2.7.0"
 mlkit = "17.1.0"
+mlkitFaceMesh = "16.0.0-beta1"  # ADDED
 filament = "1.20.3"
 dexter = "6.2.3"
 coroutines = "1.7.3"
@@ -46,6 +47,7 @@ camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = 
 
 # ML Kit
 mlkit-face-detection = { group = "com.google.android.gms", name = "play-services-mlkit-face-detection", version.ref = "mlkit" }
+mlkit-face-mesh = { group = "com.google.mlkit", name = "face-mesh-detection", version.ref = "mlkitFaceMesh" }  # ADDED
 
 # Networking
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }

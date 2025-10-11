@@ -13,28 +13,43 @@
         android:layout_height="match_parent"
         android:background="#000000">
 
-        <!-- AR Surface View -->
         <android.opengl.GLSurfaceView
             android:id="@+id/surfaceView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/controlPanel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Face Scan Overlay -->
+        <FrameLayout
+            android:id="@+id/cameraPreview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            android:background="#000000"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextureView
+                android:id="@+id/textureView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
         <View
             android:id="@+id/faceOverlay"
             android:layout_width="200dp"
             android:layout_height="250dp"
             android:background="@drawable/face_scan_overlay"
-            app:layout_constraintTop_toTopOf="@id/surfaceView"
-            app:layout_constraintBottom_toBottomOf="@id/surfaceView"
-            app:layout_constraintStart_toStartOf="@id/surfaceView"
-            app:layout_constraintEnd_toEndOf="@id/surfaceView" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/controlPanel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- HUD Elements -->
         <LinearLayout
             android:id="@+id/hudTop"
             android:layout_width="0dp"
@@ -42,7 +57,7 @@
             android:orientation="vertical"
             android:padding="16dp"
             android:background="@drawable/gradient_overlay_top"
-            app:layout_constraintTop_toTopOf="@id/surfaceView"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -65,9 +80,35 @@
                 android:textStyle="bold"
                 android:fontFamily="monospace" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:background="@drawable/hud_panel_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Method: "
+                    android:textColor="#888888"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace" />
+
+                <TextView
+                    android:id="@+id/tvScanMethod"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DETECTING..."
+                    android:textColor="#00E5FF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace" />
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- Scan Status -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -103,7 +144,6 @@
 
         </LinearLayout>
 
-        <!-- Control Panel -->
         <LinearLayout
             android:id="@+id/controlPanel"
             android:layout_width="0dp"

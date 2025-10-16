@@ -53,14 +53,14 @@
     <!-- Reply -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="0dp"
         android:overScrollMode="ifContentScrolls"
         android:scrollbars="vertical"
         android:fillViewport="true"
         android:layout_gravity="center_horizontal"
-        android:maxHeight="300dp">
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/reply"
@@ -78,7 +78,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:paddingBottom="8dp">
 
         <Button
             android:id="@+id/ask_btn"

@@ -37,6 +37,66 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+<<<<<<< Updated upstream
+=======
+    implementation(libs.core.ktx)
+
+    // ARCore and Camera
+    implementation(libs.arcore)
+    implementation(libs.camera2)
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // ML Kit Face Detection
+    implementation(libs.mlkit.face.detection)
+    implementation(libs.mlkit.face.mesh)  // ADDED - Critical for 3D face mesh
+
+    // Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
+    implementation(libs.moshi)
+    implementation(libs.retrofit.moshi)
+
+    // ViewModel and LiveData
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.runtime.compose)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
+    // Compose runtime-livedata
+    implementation(libs.compose.runtime.livedata)
+
+    // OpenGL and 3D rendering
+    implementation(libs.filament.android)
+    implementation(libs.gltfio.android)
+
+    // Permissions
+    implementation(libs.dexter)
+
+    // Volley
+    implementation(libs.volley)
+
+    // Fragment
+    implementation(libs.fragment)
+    implementation(libs.fragment.ktx)
+
+    // Google Play Services
+    implementation(libs.play.services.location)
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("androidx.fragment:fragment:1.6.1")
+    implementation("com.google.android.libraries.places:places:3.3.0")
+
+    // MPAndroidChart - For pie chart visualization in scan results
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // Testing
+>>>>>>> Stashed changes
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

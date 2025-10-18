@@ -1,9 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Eldercare" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Base application theme -->
+    <style name="Base.Theme.ElderCare" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="android:statusBarColor">@color/background_main</item>
+        <item name="android:navigationBarColor">@color/background_main</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/background_main</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:fontFamily">@font/font_regular</item>
     </style>
 
-    <style name="Theme.Eldercare" parent="Base.Theme.Eldercare" />
+    <style name="Theme.ElderCare" parent="Base.Theme.ElderCare" />
+
+    <!-- NoActionBar variant (for activities that don't need action bar) -->
+    <style name="Theme.ElderCare.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="Button.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/button_primary</item>
+        <item name="android:textColor">@color/text_white</item>
+        <item name="android:fontFamily">@font/font_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+    </style>
+
+    <style name="Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/button_primary</item>
+        <item name="android:textColor">@color/button_primary</item>
+        <item name="android:fontFamily">@font/font_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- Text Styles -->
+    <style name="TextStyle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/font_regular</item>
+    </style>
+
+    <style name="TextStyle.Title">
+        <item name="android:textColor">@color/text_title</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:fontFamily">@font/font_extrabold</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="TextStyle.Subtitle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/font_bold</item>
+    </style>
+
+    <style name="TextStyle.Body">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/font_regular</item>
+    </style>
+
+    <style name="TextStyle.Caption">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/font_regular</item>
+    </style>
+
+    <!-- Scan UI Styles -->
+    <style name="TextStyle.HUD">
+        <item name="android:textColor">@color/text_white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/robotomono_regular</item>
+        <item name="android:shadowColor">@color/background_dark</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">4</item>
+    </style>
+
+    <style name="TextStyle.Status">
+        <item name="android:textColor">@color/text_white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/font_bold</item>
+        <item name="android:textAlignment">center</item>
+    </style>
 </resources>

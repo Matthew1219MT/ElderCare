@@ -15,7 +15,8 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="8dp"
         android:src="@drawable/eldercare_textlogo"
-        android:contentDescription="ElderCare Logo" />
+        android:contentDescription="ElderCare Logo"
+        android:layout_marginTop="15dp"/>
 
     <!-- Home Section Title -->
     <TextView
@@ -51,6 +52,7 @@
 
     <!-- Facial Analysis -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/facial_analysis_btn"
         android:fontFamily="@font/font_bold"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -72,6 +74,7 @@
 
     <!-- Emergency -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/emergency_btn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
@@ -80,6 +83,7 @@
         app:cardBackgroundColor="#BF5F56">
 
         <TextView
+            android:id="@+id/emergencyCardText"
             android:fontFamily="@font/font_bold"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -112,6 +116,7 @@
 
     <!-- AI Doctor -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/ai_doctor_btn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"

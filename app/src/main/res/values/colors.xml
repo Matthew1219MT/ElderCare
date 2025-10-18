@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Basic Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Primary Colors -->
+    <color name="primary">#BF5F56</color>
+    <color name="primary_dark">#8C2E2E</color>
+    <color name="primary_light">#D98B84</color>
+    <color name="eldercare_primary">#BF5F56</color>
+    <color name="teal_700">#018786</color>
+
+    <!-- Background Colors -->
+    <color name="background_main">#D9D4CC</color>
+    <color name="background_light">#FFFFFF</color>
+    <color name="background_dark">#000000</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#666666</color>
+    <color name="text_title">#8C2E2E</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_warning">#FF6B6B</color>
+    <color name="accent_success">#51CF66</color>
+    <color name="accent_info">#4DABF7</color>
+
+    <!-- UI Elements -->
+    <color name="button_primary">#BF5F56</color>
+    <color name="button_secondary">#8C2E2E</color>
+    <color name="overlay_dark">#80000000</color>
+    <color name="overlay_light">#40FFFFFF</color>
+
+    <!-- Scan UI Colors -->
+    <color name="scan_overlay">#99000000</color>
+    <color name="scan_guide_active">#4DABF7</color>
+    <color name="scan_guide_inactive">#66FFFFFF</color>
+    <color name="hud_background">#CC000000</color>
+
+    <!-- Status Colors -->
+    <color name="status_idle">#999999</color>
+    <color name="status_scanning">#4DABF7</color>
+    <color name="status_success">#51CF66</color>
+    <color name="status_error">#FF6B6B</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
 </resources>

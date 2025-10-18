@@ -52,15 +52,15 @@ public class M_AIDoctor {
         ChatRequest chat_request = new ChatRequest(
                 openaiModel,
                 List.of(
-                    new Message("system", prePrompt),
-                    new Message("user", query)
+                        new Message("system", prePrompt),
+                        new Message("user", query)
                 )
         );
         String json_body = gson.toJson(chat_request);
         StringRequest request = new StringRequest(
-            Request.Method.POST,
-            openaiURL,
-        responseStr -> {
+                Request.Method.POST,
+                openaiURL,
+                responseStr -> {
                     try {
                         ChatCompletionResponse resp = gson.fromJson(responseStr, ChatCompletionResponse.class);
                         String reply = null;
@@ -80,7 +80,7 @@ public class M_AIDoctor {
                         onError.onError("Error parsing response: " + e.getMessage());
                     }
                 },
-            error -> {
+                error -> {
                     Log.e("M_AIDoctor", "Full error: " + error.toString());
                     if (error.networkResponse != null) {
                         Log.e("M_AIDoctor", "Status code: " + error.networkResponse.statusCode);

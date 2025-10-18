@@ -2,9 +2,14 @@ package com.eldercare.eldercare.view;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,8 +35,13 @@ import com.eldercare.eldercare.activity.FaceScanActivity;
 import com.eldercare.eldercare.service.FallDetectionService;
 import com.eldercare.eldercare.viewmodel.VM_HomePage;
 
-public class V_HomePage extends AppCompatActivity {
+public class V_HomePage extends AppCompatActivity implements SensorEventListener {
 
+    private SensorManager sensorManager;
+    private Sensor lightSensor;
+    private Sensor tempSensor;
+    private float lightLevel;
+    private float temperature;
     private CardView facialAnalysis, emergency, aiDoctor;
     private VM_HomePage viewModel;
 
@@ -67,6 +77,14 @@ public class V_HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        if(tempSensor == null) Toast.makeText(this, "Temperature Senor is not available", Toast.LENGTH_LONG).show();
+        lightLevel = -1.0f;
+        temperature = -1.0f;
+
         facialAnalysis = findViewById(R.id.facial_analysis_btn);
         emergency = findViewById(R.id.emergency_btn);
         emergencyCardText = findViewById(R.id.emergencyCardText);
@@ -112,6 +130,43 @@ public class V_HomePage extends AppCompatActivity {
         checkNotificationPermissions();
         viewModel.handleIntent(getIntent());
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (lightSensor != null) {
+            sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if (tempSensor != null) {
+            sensorManager.registerListener(this, tempSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+            lightLevel = event.values[0];
+        } else if (event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
+            if(event.values != null && event.values.length>0){
+                temperature = event.values[0];
+                if(temperature > 100 || temperature < -100){
+                    temperature = -1.0f;
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -186,7 +241,7 @@ public class V_HomePage extends AppCompatActivity {
     private void activateEmergencyService() {
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
         smsIntent.setData(Uri.parse("smsto:000  "));
-        smsIntent.putExtra("sms_body", "This is an emergency! Please help!");
+        smsIntent.putExtra("sms_body", String.format("This is an emergency! Please help! The temperature currently is %.1f °C and light level is %.1f lux around here.", temperature, lightLevel));
         startActivity(smsIntent);
     }
 }

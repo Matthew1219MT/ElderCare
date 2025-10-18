@@ -3,6 +3,7 @@ package com.eldercare.eldercare.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
@@ -20,10 +21,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.databinding.ActivityEmergencyBinding;
 import com.eldercare.eldercare.model.Hospital;
+import com.eldercare.eldercare.view.V_HomePage;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -41,6 +44,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -66,6 +70,8 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
     private Marker userMarker;
     private Marker hospitalMarker;
     private final List<Hospital> hospitalList = new ArrayList<>();
+    private int selectedIndex = -1;
+    private FloatingActionButton fabHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +126,13 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
 
+        fabHome = findViewById(R.id.fabHome);
+
+        fabHome.setOnClickListener(v -> {
+            Intent intent = new Intent(EmergencyActivity.this, V_HomePage.class);
+            startActivity(intent);
+        });
+
     }
 
     @Override
@@ -140,6 +153,7 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
                     Log.d("DEBUG_LOCATION", "Lat: " + location.getLatitude() + ", Lng: " + location.getLongitude());
                     userLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     map.clear();
+                    selectedIndex = -1;
                     userMarker = map.addMarker(new MarkerOptions()
                             .position(userLocation)
                             .title("You are here"));
@@ -255,6 +269,12 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
             card.setRadius(12f);
             card.setCardElevation(8f);
 
+            if (i == selectedIndex) {
+                card.setCardBackgroundColor(ContextCompat.getColor(this, R.color.eldercare_primary));
+            } else {
+                card.setCardBackgroundColor(Color.WHITE);
+            }
+
             LinearLayout layout = new LinearLayout(this);
             layout.setOrientation(LinearLayout.VERTICAL);
             layout.setPadding(24, 24, 24, 24);
@@ -270,8 +290,14 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
 
             Button button = new Button(this);
             button.setText("View on Map");
+            button.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.teal_700));
+            button.setTextColor(Color.WHITE);
             int finalI = i;
-            button.setOnClickListener(v -> focusHospitalOnMap(finalI));
+            button.setOnClickListener(v -> {
+                selectedIndex = finalI;
+                focusHospitalOnMap(finalI);
+                showHospitalCards();
+            });
 
             layout.addView(nameView);
             layout.addView(addressView);

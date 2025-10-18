@@ -1,14 +1,5 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-}
-
-val properties = Properties()
-val localPropertiesFile = project.rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    properties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -23,12 +14,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField(
-            type = "String",
-            name = "OPENAI_API_KEY",
-            value = properties.getProperty("OPENAI_API_KEY", "null")
-        )
-        android.buildFeatures.buildConfig = true
     }
 
     buildTypes {
@@ -44,17 +29,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
-    buildFeatures {
-        viewBinding = true
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        dataBinding = true
-        viewBinding = true
-    }
 }
 
 dependencies {
@@ -63,6 +37,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+<<<<<<< Updated upstream
+=======
     implementation(libs.core.ktx)
 
     // ARCore and Camera
@@ -110,11 +86,17 @@ dependencies {
     implementation(libs.fragment)
     implementation(libs.fragment.ktx)
 
+    // Google Play Services
     implementation(libs.play.services.location)
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("androidx.fragment:fragment:1.6.1")
     implementation("com.google.android.libraries.places:places:3.3.0")
 
+    // MPAndroidChart - For pie chart visualization in scan results
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // Testing
+>>>>>>> Stashed changes
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

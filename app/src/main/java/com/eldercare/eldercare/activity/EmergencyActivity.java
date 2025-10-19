@@ -141,7 +141,7 @@ public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCa
         map = googleMap;
 
         locationRequest = new LocationRequest.Builder(
-                Priority.PRIORITY_HIGH_ACCURACY, 60000
+                Priority.PRIORITY_HIGH_ACCURACY, 20000
         ).build();
 
         locationCallback = new LocationCallback() {

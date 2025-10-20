@@ -43,6 +43,8 @@ public class CameraHandler {
     private Handler backgroundHandler;
     private CameraCallback callback;
     private Size previewSize;
+    private String currentCameraId;
+    private boolean isFrontCamera = true;
 
     public CameraHandler(Context context, TextureView textureView, CameraCallback callback) {
         this.context = context;
@@ -51,6 +53,11 @@ public class CameraHandler {
     }
 
     public void startCamera() {
+        startCamera(true); // Default to front camera
+    }
+
+    public void startCamera(boolean useFrontCamera) {
+        this.isFrontCamera = useFrontCamera;
         startBackgroundThread();
 
         if (textureView.isAvailable()) {
@@ -58,6 +65,17 @@ public class CameraHandler {
         } else {
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }
+    }
+
+    public void switchCamera() {
+        Log.d(TAG, "Switching camera");
+        stopCamera();
+        isFrontCamera = !isFrontCamera;
+        startCamera(isFrontCamera);
+    }
+
+    public boolean isFrontCamera() {
+        return isFrontCamera;
     }
 
     private final TextureView.SurfaceTextureListener surfaceTextureListener =
@@ -91,13 +109,14 @@ public class CameraHandler {
         CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
 
         try {
-            String cameraId = getFrontCameraId(manager);
+            String cameraId = isFrontCamera ? getFrontCameraId(manager) : getBackCameraId(manager);
 
             if (cameraId == null) {
-                callback.onError("No front camera found");
+                callback.onError("Camera not found");
                 return;
             }
 
+            currentCameraId = cameraId;
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             previewSize = new Size(IMAGE_WIDTH, IMAGE_HEIGHT);
 
@@ -112,7 +131,7 @@ public class CameraHandler {
             imageReader.setOnImageAvailableListener(imageAvailableListener, backgroundHandler);
 
             manager.openCamera(cameraId, stateCallback, backgroundHandler);
-            Log.d(TAG, "Opening camera: " + cameraId);
+            Log.d(TAG, "Opening camera: " + cameraId + " (Front: " + isFrontCamera + ")");
 
         } catch (CameraAccessException e) {
             Log.e(TAG, "Camera access exception", e);
@@ -125,6 +144,17 @@ public class CameraHandler {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
             if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                return cameraId;
+            }
+        }
+        return null;
+    }
+
+    private String getBackCameraId(CameraManager manager) throws CameraAccessException {
+        for (String cameraId : manager.getCameraIdList()) {
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+            if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                 return cameraId;
             }
         }
@@ -220,6 +250,10 @@ public class CameraHandler {
                         if (image != null) {
                             Bitmap bitmap = imageToBitmap(image);
                             if (bitmap != null) {
+                                // Mirror front camera images
+                                if (isFrontCamera) {
+                                    bitmap = flipBitmap(bitmap);
+                                }
                                 callback.onImageCaptured(bitmap);
                             }
                         }
@@ -243,6 +277,12 @@ public class CameraHandler {
             Log.e(TAG, "Error converting image to bitmap", e);
             return null;
         }
+    }
+
+    private Bitmap flipBitmap(Bitmap source) {
+        Matrix matrix = new Matrix();
+        matrix.preScale(-1.0f, 1.0f);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     public void stopCamera() {

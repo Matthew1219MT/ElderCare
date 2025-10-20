@@ -4,9 +4,12 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.TextureView;
@@ -22,16 +25,27 @@ import androidx.lifecycle.ViewModelProvider;
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.utils.CameraHandler;
 import com.eldercare.eldercare.databinding.ActivityFaceScanBinding;
+import com.eldercare.eldercare.utils.FaceOverlayView;
+import com.eldercare.eldercare.utils.FaceMeshConnections;
 import com.eldercare.eldercare.utils.FaceProcessorFactory;
 import com.eldercare.eldercare.model.FaceScanData;
 import com.eldercare.eldercare.utils.DeviceCapabilityChecker;
 import com.eldercare.eldercare.viewmodel.FaceScanViewModel;
 import com.google.ar.core.*;
 import com.google.ar.core.exceptions.*;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.common.PointF3D;
+import com.google.mlkit.vision.facemesh.FaceMesh;
+import com.google.mlkit.vision.facemesh.FaceMeshDetection;
+import com.google.mlkit.vision.facemesh.FaceMeshDetector;
+import com.google.mlkit.vision.facemesh.FaceMeshDetectorOptions;
+import com.google.mlkit.vision.facemesh.FaceMeshPoint;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
     private static final String TAG = "FaceScanActivity";
@@ -48,12 +62,18 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
 
     // ML Kit specific
     private CameraHandler cameraHandler;
-    private long lastProcessTime = 0;
-    private static final long PROCESS_INTERVAL = 500; // Process every 500ms
+    private Bitmap latestFrame;
+    private FaceMeshDetector faceMeshDetector;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    // Face tracking
+    private boolean isFaceDetected = false;
+    private long lastTrackingTime = 0;
+    private static final long TRACKING_INTERVAL = 100; // Track every 100ms
+    private List<int[]> faceConnections;
 
     // Shared
     private FaceScanData currentScanData;
-    private boolean isScanning = false;
     private boolean permissionGranted = false;
 
     @Override
@@ -65,9 +85,24 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
 
+        setupFaceMeshDetector();
         setupObservers();
         setupUI();
         checkCameraPermission();
+    }
+
+    private void setupFaceMeshDetector() {
+        // Use Face Mesh Detection for 468 3D face points
+        FaceMeshDetectorOptions options = new FaceMeshDetectorOptions.Builder()
+                .setUseCase(FaceMeshDetectorOptions.FACE_MESH)
+                .build();
+
+        faceMeshDetector = FaceMeshDetection.getClient(options);
+
+        // Get face mesh connections for drawing
+        faceConnections = FaceMeshConnections.getSimplifiedConnections();
+
+        Log.d(TAG, "Face Mesh Detector initialized with " + faceConnections.size() + " connections");
     }
 
     private void checkCameraPermission() {
@@ -82,7 +117,6 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
 
     private void requestCameraPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            // Show explanation dialog
             new AlertDialog.Builder(this)
                     .setTitle("Camera Permission Required")
                     .setMessage("This app needs camera access to scan your face. Please grant camera permission to continue.")
@@ -100,7 +134,6 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                     .create()
                     .show();
         } else {
-            // Request permission directly
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     CAMERA_PERMISSION_REQUEST_CODE);
@@ -133,7 +166,6 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
             return;
         }
 
-        // Create unified face processor that detects device capability
         faceProcessor = FaceProcessorFactory.createFaceProcessor(this,
                 new FaceProcessorFactory.UnifiedFaceCallback() {
                     @Override
@@ -142,11 +174,9 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                         String description = DeviceCapabilityChecker.getScanMethodDescription(method);
 
                         runOnUiThread(() -> {
-                            // Show scan method info
                             binding.tvScanMethod.setText(method.name());
-                            Toast.makeText(FaceScanActivity.this, description, Toast.LENGTH_LONG).show();
+                            Toast.makeText(FaceScanActivity.this, description, Toast.LENGTH_SHORT).show();
 
-                            // Setup appropriate UI based on scan method
                             if (method == DeviceCapabilityChecker.ScanMethod.ARCORE) {
                                 setupARCoreMode();
                             } else if (method == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
@@ -167,7 +197,7 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                             viewModel.processScanData(faceScanData);
                             int pointCount = faceScanData.getPoints() != null ?
                                     faceScanData.getPoints().size() : 0;
-                            binding.tvScanStatus.setText("Face detected - " + pointCount + " points");
+                            binding.tvCameraStatus.setText("Face detected - " + pointCount + " points");
                         });
                     }
 
@@ -176,8 +206,8 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                         runOnUiThread(() -> {
                             currentScanData = faceScanData;
                             viewModel.completeScan();
-                            binding.tvScanStatus.setText("Scan complete!");
-                            stopScanning();
+                            binding.tvCameraStatus.setText("Scan complete!");
+                            binding.loadingProgress.setVisibility(View.GONE);
                         });
                     }
 
@@ -185,7 +215,8 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                     public void onError(String error) {
                         runOnUiThread(() -> {
                             viewModel.errorOccurred();
-                            binding.tvScanStatus.setText("Error: " + error);
+                            binding.tvCameraStatus.setText("Error: " + error);
+                            binding.loadingProgress.setVisibility(View.GONE);
                             Toast.makeText(FaceScanActivity.this, error, Toast.LENGTH_SHORT).show();
                         });
                     }
@@ -195,43 +226,48 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
     private void setupARCoreMode() {
         Log.d(TAG, "Setting up ARCore mode");
 
-        // Show ARCore surface view
-        binding.surfaceView.setVisibility(View.VISIBLE);
-        binding.cameraPreview.setVisibility(View.GONE);
+        try {
+            binding.surfaceView.setVisibility(View.VISIBLE);
+            binding.cameraPreview.setVisibility(View.GONE);
 
-        // Setup GLSurfaceView for ARCore
-        binding.surfaceView.setPreserveEGLContextOnPause(true);
-        binding.surfaceView.setEGLContextClientVersion(2);
-        binding.surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        binding.surfaceView.setRenderer(this);
-        binding.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+            binding.surfaceView.setPreserveEGLContextOnPause(true);
+            binding.surfaceView.setEGLContextClientVersion(2);
+            binding.surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+            binding.surfaceView.setRenderer(this);
+            binding.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
-        // Setup AR Session
-        setupARSession();
+            setupARSession();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to setup ARCore mode", e);
+            Toast.makeText(this,
+                    "ARCore setup failed. Switching to ML Kit mode.",
+                    Toast.LENGTH_LONG).show();
+
+            scanMethod = DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH;
+            binding.tvScanMethod.setText("MLKIT_FACE_MESH");
+            setupMLKitMode();
+        }
     }
 
     private void setupMLKitMode() {
         Log.d(TAG, "Setting up ML Kit mode");
 
-        // Hide ARCore surface view, show camera preview container
         binding.surfaceView.setVisibility(View.GONE);
         binding.cameraPreview.setVisibility(View.VISIBLE);
 
-        // Get the TextureView for camera preview
         TextureView textureView = binding.textureView;
 
-        // Setup camera handler for ML Kit with preview
         cameraHandler = new CameraHandler(this, textureView, new CameraHandler.CameraCallback() {
             @Override
             public void onImageCaptured(Bitmap bitmap) {
-                // Throttle processing to avoid overwhelming the processor
-                long currentTime = System.currentTimeMillis();
-                if (isScanning && currentTime - lastProcessTime > PROCESS_INTERVAL) {
-                    lastProcessTime = currentTime;
+                latestFrame = bitmap;
 
-                    if (faceProcessor != null && faceProcessor.getMlkitProcessor() != null) {
-                        faceProcessor.getMlkitProcessor().processImage(bitmap);
-                    }
+                // Perform real-time face tracking
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastTrackingTime > TRACKING_INTERVAL) {
+                    lastTrackingTime = currentTime;
+                    trackFaceInRealtime(bitmap);
                 }
             }
 
@@ -244,7 +280,90 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
             }
         });
 
-        Log.d(TAG, "ML Kit mode setup complete");
+        // Configure overlay
+        binding.faceOverlay.setFrontCamera(true);
+
+        cameraHandler.startCamera(true); // Start with front camera
+        binding.tvCameraStatus.setText("Ready to capture");
+
+        Log.d(TAG, "ML Kit mode setup complete - camera started");
+    }
+
+    private void trackFaceInRealtime(Bitmap bitmap) {
+        if (bitmap == null) return;
+
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
+
+        faceMeshDetector.process(image)
+                .addOnSuccessListener(faceMeshes -> {
+                    if (!faceMeshes.isEmpty()) {
+                        if (!isFaceDetected) {
+                            isFaceDetected = true;
+                            mainHandler.post(() -> {
+                                binding.tvFaceDetected.setVisibility(View.VISIBLE);
+                            });
+                        }
+
+                        // Draw face mesh on overlay
+                        FaceMesh faceMesh = faceMeshes.get(0);
+                        drawFaceMesh(faceMesh, bitmap.getWidth(), bitmap.getHeight());
+                    } else {
+                        if (isFaceDetected) {
+                            isFaceDetected = false;
+                            mainHandler.post(() -> {
+                                binding.tvFaceDetected.setVisibility(View.GONE);
+                                binding.faceOverlay.clear();
+                            });
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Face mesh detection failed", e);
+                });
+    }
+
+    private void drawFaceMesh(FaceMesh faceMesh, int imageWidth, int imageHeight) {
+        List<PointF> points = new ArrayList<>();
+        List<FaceOverlayView.Line> lines = new ArrayList<>();
+
+        // Get all face mesh points (468 points)
+        List<FaceMeshPoint> allPoints = faceMesh.getAllPoints();
+
+        // Convert PointF3D to PointF (we only need x, y for 2D display)
+        for (FaceMeshPoint point : allPoints) {
+            PointF3D position3D = point.getPosition();
+            // Convert PointF3D to PointF by taking only x and y coordinates
+            PointF position2D = new PointF(position3D.getX(), position3D.getY());
+            points.add(position2D);
+        }
+
+        // Create lines between connected points
+        for (int[] connection : faceConnections) {
+            if (connection.length == 2) {
+                int startIdx = connection[0];
+                int endIdx = connection[1];
+
+                if (startIdx < allPoints.size() && endIdx < allPoints.size()) {
+                    PointF3D start3D = allPoints.get(startIdx).getPosition();
+                    PointF3D end3D = allPoints.get(endIdx).getPosition();
+
+                    // Convert to 2D points
+                    PointF start = new PointF(start3D.getX(), start3D.getY());
+                    PointF end = new PointF(end3D.getX(), end3D.getY());
+
+                    lines.add(new FaceOverlayView.Line(start, end));
+                }
+            }
+        }
+
+        // Update overlay on main thread
+        mainHandler.post(() -> {
+            binding.faceOverlay.setImageDimensions(imageWidth, imageHeight);
+            binding.faceOverlay.setFrontCamera(cameraHandler.isFrontCamera());
+            binding.faceOverlay.setFaceData(points, lines);
+        });
+
+        Log.d(TAG, "Drew " + points.size() + " points and " + lines.size() + " lines");
     }
 
     private void setupARSession() {
@@ -262,15 +381,36 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
 
                 Config config = new Config(arSession);
                 config.setAugmentedFaceMode(Config.AugmentedFaceMode.MESH3D);
-                arSession.configure(config);
 
-                Log.d(TAG, "ARCore session setup successful");
+                try {
+                    arSession.configure(config);
+                    Log.d(TAG, "ARCore session setup successful with MESH3D");
+                } catch (UnsupportedConfigurationException e) {
+                    Log.w(TAG, "Augmented Faces not supported, falling back to ML Kit", e);
+
+                    if (arSession != null) {
+                        arSession.close();
+                        arSession = null;
+                    }
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this,
+                                "ARCore face tracking not supported. Using ML Kit instead.",
+                                Toast.LENGTH_LONG).show();
+
+                        scanMethod = DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH;
+                        binding.tvScanMethod.setText("MLKIT_FACE_MESH");
+                        setupMLKitMode();
+                    });
+                    return;
+                }
 
             } catch (UnavailableArcoreNotInstalledException
                      | UnavailableUserDeclinedInstallationException e) {
                 Log.e(TAG, "ARCore not available", e);
-                Toast.makeText(this, "ARCore is required but not available", Toast.LENGTH_LONG).show();
-                finish();
+                Toast.makeText(this, "ARCore not available, using ML Kit", Toast.LENGTH_LONG).show();
+                scanMethod = DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH;
+                setupMLKitMode();
             } catch (UnavailableApkTooOldException e) {
                 Toast.makeText(this, "Please update ARCore", Toast.LENGTH_LONG).show();
                 finish();
@@ -292,32 +432,36 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                     binding.btnStartScan.setVisibility(View.VISIBLE);
                     binding.btnViewResult.setVisibility(View.GONE);
                     binding.btnUpload.setVisibility(View.GONE);
-                    binding.progressBar.setVisibility(View.GONE);
+                    binding.loadingProgress.setVisibility(View.GONE);
+                    binding.btnStartScan.setEnabled(true);
+                    binding.btnStartScan.setText("Take Photo");
                     break;
                 case SCANNING:
-                    binding.btnStartScan.setVisibility(View.GONE);
-                    binding.progressBar.setVisibility(View.VISIBLE);
-                    binding.tvScanStatus.setText("Scanning face...");
+                    binding.btnStartScan.setEnabled(false);
+                    binding.loadingProgress.setVisibility(View.VISIBLE);
+                    binding.tvCameraStatus.setText("Processing...");
                     break;
                 case PROCESSING:
-                    binding.tvScanStatus.setText("Processing scan data...");
+                    binding.tvCameraStatus.setText("Analyzing face data...");
                     break;
                 case COMPLETED:
-                    binding.progressBar.setVisibility(View.GONE);
+                    binding.loadingProgress.setVisibility(View.GONE);
                     binding.btnViewResult.setVisibility(View.VISIBLE);
                     binding.btnUpload.setVisibility(View.VISIBLE);
-                    binding.tvScanStatus.setText("Scan completed successfully!");
+                    binding.btnStartScan.setEnabled(true);
+                    binding.tvCameraStatus.setText("Scan completed!");
                     break;
                 case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.btnStartScan.setVisibility(View.VISIBLE);
+                    binding.loadingProgress.setVisibility(View.GONE);
+                    binding.btnStartScan.setEnabled(true);
+                    binding.tvCameraStatus.setText("Ready to capture");
                     break;
             }
         });
 
         viewModel.getUploadStatus().observe(this, status -> {
             if (status != null) {
-                binding.tvScanStatus.setText(status);
+                binding.tvCameraStatus.setText(status);
                 if (status.contains("successful")) {
                     Toast.makeText(this, "Face scan uploaded successfully!", Toast.LENGTH_SHORT).show();
                 }
@@ -332,13 +476,33 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
     }
 
     private void setupUI() {
-        binding.btnStartScan.setOnClickListener(v -> startFaceScan());
+        binding.btnStartScan.setOnClickListener(v -> captureAndProcessFace());
         binding.btnViewResult.setOnClickListener(v -> viewScanResult());
         binding.btnUpload.setOnClickListener(v -> uploadScanData());
         binding.btnBack.setOnClickListener(v -> finish());
+        binding.btnSwitchCamera.setOnClickListener(v -> switchCamera());
     }
 
-    private void startFaceScan() {
+    private void switchCamera() {
+        if (cameraHandler != null) {
+            cameraHandler.switchCamera();
+            boolean isFront = cameraHandler.isFrontCamera();
+
+            // Update overlay for camera orientation
+            binding.faceOverlay.setFrontCamera(isFront);
+
+            Toast.makeText(this,
+                    isFront ? "Switched to front camera" : "Switched to back camera",
+                    Toast.LENGTH_SHORT).show();
+
+            // Clear face overlay when switching
+            binding.faceOverlay.clear();
+            isFaceDetected = false;
+            binding.tvFaceDetected.setVisibility(View.GONE);
+        }
+    }
+
+    private void captureAndProcessFace() {
         if (!permissionGranted) {
             Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
             requestCameraPermission();
@@ -346,42 +510,19 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
         }
 
         viewModel.startScanning();
-        isScanning = true;
+        binding.tvCameraStatus.setText("Capturing...");
 
-        if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
-            // Start ARCore scanning
-            if (arSession != null) {
-                try {
-                    arSession.resume();
-                    Log.d(TAG, "ARCore scanning started");
-                } catch (CameraNotAvailableException e) {
-                    Log.e(TAG, "Camera not available", e);
-                    viewModel.errorOccurred();
-                }
-            }
-        } else if (scanMethod == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
-            // Start ML Kit scanning
-            if (cameraHandler != null) {
-                cameraHandler.startCamera();
-                Log.d(TAG, "ML Kit scanning started");
+        if (scanMethod == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
+            if (latestFrame != null && faceProcessor != null && faceProcessor.getMlkitProcessor() != null) {
+                Log.d(TAG, "Processing captured frame");
+                faceProcessor.getMlkitProcessor().processImage(latestFrame);
             } else {
-                Log.e(TAG, "CameraHandler is null");
-                Toast.makeText(this, "Camera not initialized", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "No frame available or processor is null");
+                Toast.makeText(this, "Please wait for camera to initialize", Toast.LENGTH_SHORT).show();
+                viewModel.errorOccurred();
             }
-        }
-    }
-
-    private void stopScanning() {
-        isScanning = false;
-
-        if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
-            if (arSession != null) {
-                arSession.pause();
-            }
-        } else if (scanMethod == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
-            if (cameraHandler != null) {
-                cameraHandler.stopCamera();
-            }
+        } else if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
+            Log.d(TAG, "ARCore face capture triggered");
         }
     }
 
@@ -401,12 +542,9 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
         }
     }
 
-    // ========== GLSurfaceView.Renderer methods (for ARCore only) ==========
-
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
         try {
             if (arSession != null) {
                 arSession.setCameraTextureName(0);
@@ -436,7 +574,7 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
             arSession.setCameraTextureName(0);
             Frame frame = arSession.update();
 
-            if (isScanning) {
+            if (viewModel.getScanState().getValue() == FaceScanViewModel.ScanState.SCANNING) {
                 Collection<AugmentedFace> faces = arSession.getAllTrackables(AugmentedFace.class);
                 if (!faces.isEmpty() && faceProcessor != null && faceProcessor.getArProcessor() != null) {
                     faceProcessor.getArProcessor().processAugmentedFaces(faces);
@@ -447,8 +585,6 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
             Log.e(TAG, "Error in onDrawFrame", e);
         }
     }
-
-    // ========== Lifecycle methods ==========
 
     @Override
     protected void onResume() {
@@ -464,14 +600,16 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
                 }
             }
             binding.surfaceView.onResume();
+        } else if (scanMethod == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
+            if (cameraHandler != null) {
+                cameraHandler.startCamera(cameraHandler.isFrontCamera());
+            }
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        stopScanning();
 
         if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
             if (arSession != null) {
@@ -496,6 +634,10 @@ public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView
 
         if (faceProcessor != null) {
             faceProcessor.cleanup();
+        }
+
+        if (faceMeshDetector != null) {
+            faceMeshDetector.close();
         }
     }
 }

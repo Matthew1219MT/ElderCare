@@ -238,7 +238,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
 
         //TO BE REPLACED WITH EMERGENCY ACTIVITY
         confirmBtn.setOnClickListener(v -> {
-            dialog.dismiss();
+            activateEmergencyService();
         });
     }
 

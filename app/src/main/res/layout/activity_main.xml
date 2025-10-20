@@ -87,7 +87,28 @@
             android:fontFamily="@font/font_bold"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Emergency"
+            android:text="SOS"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Emergency Services -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/emergency_services"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="#ADD2F3">
+
+        <TextView
+            android:fontFamily="@font/font_bold"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Emergency Services"
             android:gravity="center"
             android:textSize="24sp"
             android:textStyle="bold"

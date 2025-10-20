@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="AI Doctor's Reply"
+        android:text="Facial Analysis Disclaimer"
         android:textAlignment="center"
         android:textColor="#8C2E2E"
         android:textSize="35sp"
@@ -50,44 +50,43 @@
         android:layout_marginTop="20dp"
         android:gravity="center" />
 
-    <!-- Reply -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+    <!-- Disclaimer -->
+    <TextView
+        android:id="@+id/disclaimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="ElderCare Face Scan uses AI technology to analyze facial symmetry for potential stroke indicators. This is a screening tool only and NOT a medical diagnosis. Facial asymmetry can have many causes. ElderCare is not liable for decisions based on scan results. Always seek immediate medical attention if you suspect a stroke or have health concerns."
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="24sp"
+        android:fontFamily="@font/font_regular"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="0dp"
-        android:overScrollMode="ifContentScrolls"
-        android:scrollbars="vertical"
-        android:fillViewport="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/reply"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Reply"
-            android:textAlignment="center"
-            android:textColor="#000"
-            android:textSize="24sp"
-            android:fontFamily="@font/font_regular"
-            android:gravity="center"/>
-    </ScrollView>
+        android:gravity="center" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:gravity="center_horizontal"
-        android:paddingBottom="8dp">
+        android:layout_marginTop="20dp">
 
         <Button
-            android:id="@+id/ask_btn"
+            android:id="@+id/decline_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ask Another Question"
+            android:text="Decline"
+            android:backgroundTint="#BF5F56"
+            android:fontFamily="@font/font_regular"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/understand_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Accept"
             android:backgroundTint="#BF5F56"
             android:fontFamily="@font/font_regular"
             android:layout_marginStart="8dp"/>

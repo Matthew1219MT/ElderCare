@@ -42,7 +42,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
     private Sensor tempSensor;
     private float lightLevel;
     private float temperature;
-    private CardView facialAnalysis, emergency, aiDoctor;
+    private CardView facialAnalysis, emergency, emergServices, aiDoctor;
     private VM_HomePage viewModel;
 
     private TextView emergencyCardText;
@@ -88,6 +88,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
         facialAnalysis = findViewById(R.id.facial_analysis_btn);
         emergency = findViewById(R.id.emergency_btn);
         emergencyCardText = findViewById(R.id.emergencyCardText);
+        emergServices = findViewById(R.id.emergency_services);
         aiDoctor = findViewById(R.id.ai_doctor_btn);
         facialAnalysis.setOnClickListener(v->{
             Intent intent = new Intent(this, FaceScanActivity.class);
@@ -96,7 +97,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
         GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                startActivity(new Intent(V_HomePage.this, EmergencyActivity.class));
+                //startActivity(new Intent(V_HomePage.this, EmergencyActivity.class));
                 return true;
             }
         });
@@ -114,11 +115,14 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
                 case MotionEvent.ACTION_CANCEL:
                     emergencyIsPressed = false;
                     handler.removeCallbacks(updateCountdown);
-                    emergencyCardText.setText("Emergency");
+                    emergencyCardText.setText("SOS");
                     return true;
             }
 
             return false;
+        });
+        emergServices.setOnClickListener(v -> {
+            startActivity(new Intent(this, EmergencyActivity.class));
         });
         aiDoctor.setOnClickListener(v->{
             Intent intent = new Intent(this, V_AIDoctor.class);
@@ -234,7 +238,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
 
         //TO BE REPLACED WITH EMERGENCY ACTIVITY
         confirmBtn.setOnClickListener(v -> {
-            dialog.dismiss();
+            activateEmergencyService();
         });
     }
 

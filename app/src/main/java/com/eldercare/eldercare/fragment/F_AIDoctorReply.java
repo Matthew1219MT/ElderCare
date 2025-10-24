@@ -37,7 +37,7 @@ public class F_AIDoctorReply extends Fragment {
         askBtn = view.findViewById(R.id.ask_btn);
         askBtn.setOnClickListener(v -> {
             viewModel.setReponse("");
-            viewModel.switchFragment(VM_AIDoctor.FragmentType.Disclaimer);
+            viewModel.switchFragment(VM_AIDoctor.FragmentType.Query);
         });
         backBtn = view.findViewById(R.id.back_button);
         backBtn.setOnClickListener(v->{

@@ -35,7 +35,7 @@ public class VM_AIDoctor extends AndroidViewModel {
     }
 
     public void sendQuery(String query, Consumer<String> onSuccess , Consumer<String> onError) {
-        model.askAITest(
+        model.askAI(
             query,
             onSuccess::accept,
             onError::accept

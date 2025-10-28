@@ -34,10 +34,10 @@ public class FallDetectionService extends Service implements SensorEventListener
     private Runnable autoLaunchRunnable;
     private static final int NOTIFICATION_ID = 3;
     private static final float G = 9.81f;
-    private static final float IMPACT_THRESHOLD = 1.0f * G;
-    private static final float GYRO_THRESHOLD = 1.0f;
-    private static final long WINDOW_MS = 500;
-    private static final long COOLDOWN_MS = 5000;
+    private static final float IMPACT_THRESHOLD = 2.8f * G;
+    private static final float GYRO_THRESHOLD = 3.0f;
+    private static final long WINDOW_MS = 800;
+    private static final long COOLDOWN_MS = 8000;
     private long lastImpactTime = 0;
     private long lastFallTime = 0;
 

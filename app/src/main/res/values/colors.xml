@@ -47,4 +47,8 @@
 
     <!-- Transparent -->
     <color name="transparent">#00000000</color>
+
+    <color name="success_light">#E8F5E9</color>
+    <color name="warning_light">#FFF3E0</color>
+    <color name="error_light">#FFEBEE</color>
 </resources>

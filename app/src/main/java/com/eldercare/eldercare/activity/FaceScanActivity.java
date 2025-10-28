@@ -4,640 +4,535 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.PointF;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.SurfaceTexture;
+import android.hardware.camera2.*;
+import android.media.Image;
+import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Parcelable;
-import android.util.Log;
+import android.os.HandlerThread;
+import android.util.Base64;
+import android.util.Size;
+import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
 import com.eldercare.eldercare.R;
-import com.eldercare.eldercare.utils.CameraHandler;
 import com.eldercare.eldercare.databinding.ActivityFaceScanBinding;
-import com.eldercare.eldercare.utils.FaceOverlayView;
-import com.eldercare.eldercare.utils.FaceMeshConnections;
-import com.eldercare.eldercare.utils.FaceProcessorFactory;
 import com.eldercare.eldercare.model.FaceScanData;
-import com.eldercare.eldercare.utils.DeviceCapabilityChecker;
-import com.eldercare.eldercare.viewmodel.FaceScanViewModel;
-import com.google.ar.core.*;
-import com.google.ar.core.exceptions.*;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.common.PointF3D;
-import com.google.mlkit.vision.facemesh.FaceMesh;
-import com.google.mlkit.vision.facemesh.FaceMeshDetection;
-import com.google.mlkit.vision.facemesh.FaceMeshDetector;
-import com.google.mlkit.vision.facemesh.FaceMeshDetectorOptions;
-import com.google.mlkit.vision.facemesh.FaceMeshPoint;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
+import com.eldercare.eldercare.network.RetrofitClient;
+import com.eldercare.eldercare.repository.FaceScanRepository.ApiResponse;
+import com.eldercare.eldercare.utils.FaceOverlayView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Arrays;
 
-public class FaceScanActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
-    private static final String TAG = "FaceScanActivity";
-    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
-
+public class FaceScanActivity extends AppCompatActivity {
     private ActivityFaceScanBinding binding;
-    private FaceScanViewModel viewModel;
-    private FaceProcessorFactory.FaceProcessorWrapper faceProcessor;
-    private DeviceCapabilityChecker.ScanMethod scanMethod;
+    private static final int CAMERA_PERMISSION_CODE = 100;
 
-    // ARCore specific
-    private Session arSession;
-    private boolean installRequested;
+    private CameraDevice cameraDevice;
+    private CameraCaptureSession cameraCaptureSession;
+    private CaptureRequest.Builder captureRequestBuilder;
+    private Size imageDimension;
+    private ImageReader imageReader;
+    private Handler backgroundHandler;
+    private HandlerThread backgroundThread;
 
-    // ML Kit specific
-    private CameraHandler cameraHandler;
-    private Bitmap latestFrame;
-    private FaceMeshDetector faceMeshDetector;
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
-
-    // Face tracking
-    private boolean isFaceDetected = false;
-    private long lastTrackingTime = 0;
-    private static final long TRACKING_INTERVAL = 100; // Track every 100ms
-    private List<int[]> faceConnections;
-
-    // Shared
-    private FaceScanData currentScanData;
-    private boolean permissionGranted = false;
+    private boolean isFrontCamera = true;
+    private boolean isScanning = false;
+    private boolean faceDetected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_face_scan);
 
-        viewModel = new ViewModelProvider(this).get(FaceScanViewModel.class);
-        binding.setViewModel(viewModel);
-        binding.setLifecycleOwner(this);
-
-        setupFaceMeshDetector();
-        setupObservers();
-        setupUI();
+        setupViews();
         checkCameraPermission();
     }
 
-    private void setupFaceMeshDetector() {
-        // Use Face Mesh Detection for 468 3D face points
-        FaceMeshDetectorOptions options = new FaceMeshDetectorOptions.Builder()
-                .setUseCase(FaceMeshDetectorOptions.FACE_MESH)
-                .build();
+    private void setupViews() {
+        binding.btnBack.setOnClickListener(v -> finish());
 
-        faceMeshDetector = FaceMeshDetection.getClient(options);
+        binding.btnSwitchCamera.setOnClickListener(v -> {
+            isFrontCamera = !isFrontCamera;
+            closeCamera();
+            startCamera();
+        });
 
-        // Get face mesh connections for drawing
-        faceConnections = FaceMeshConnections.getSimplifiedConnections();
+        binding.btnStartScan.setOnClickListener(v -> {
+            if (!isScanning) {
+                captureImage();
+            }
+        });
 
-        Log.d(TAG, "Face Mesh Detector initialized with " + faceConnections.size() + " connections");
+        binding.btnViewResult.setOnClickListener(v -> {
+            Toast.makeText(this, "View result clicked", Toast.LENGTH_SHORT).show();
+        });
+
+        binding.btnUpload.setOnClickListener(v -> {
+            Toast.makeText(this, "Upload clicked", Toast.LENGTH_SHORT).show();
+        });
+
+        binding.textureView.setSurfaceTextureListener(textureListener);
+
+        simulateFaceDetection();
     }
 
     private void checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            permissionGranted = true;
-            initializeFaceScanning();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
         } else {
-            requestCameraPermission();
+            startCamera();
         }
     }
 
-    private void requestCameraPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Camera Permission Required")
-                    .setMessage("This app needs camera access to scan your face. Please grant camera permission to continue.")
-                    .setPositiveButton("Grant Permission", (dialog, which) -> {
-                        ActivityCompat.requestPermissions(FaceScanActivity.this,
-                                new String[]{Manifest.permission.CAMERA},
-                                CAMERA_PERMISSION_REQUEST_CODE);
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                        Toast.makeText(FaceScanActivity.this,
-                                "Camera permission is required for face scanning",
-                                Toast.LENGTH_LONG).show();
-                        finish();
-                    })
-                    .create()
-                    .show();
+    private void startCamera() {
+        if (binding.textureView.isAvailable()) {
+            openCamera();
         } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    CAMERA_PERMISSION_REQUEST_CODE);
+            binding.textureView.setSurfaceTextureListener(textureListener);
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                permissionGranted = true;
-                Toast.makeText(this, "Camera permission granted", Toast.LENGTH_SHORT).show();
-                initializeFaceScanning();
-            } else {
-                permissionGranted = false;
-                Toast.makeText(this,
-                        "Camera permission is required for face scanning. Please enable it in settings.",
-                        Toast.LENGTH_LONG).show();
-                finish();
-            }
-        }
-    }
-
-    private void initializeFaceScanning() {
-        if (!permissionGranted) {
-            Log.e(TAG, "Cannot initialize - permission not granted");
-            return;
+    private final TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            openCamera();
         }
 
-        faceProcessor = FaceProcessorFactory.createFaceProcessor(this,
-                new FaceProcessorFactory.UnifiedFaceCallback() {
-                    @Override
-                    public void onScanMethodDetermined(DeviceCapabilityChecker.ScanMethod method) {
-                        scanMethod = method;
-                        String description = DeviceCapabilityChecker.getScanMethodDescription(method);
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {}
 
-                        runOnUiThread(() -> {
-                            binding.tvScanMethod.setText(method.name());
-                            Toast.makeText(FaceScanActivity.this, description, Toast.LENGTH_SHORT).show();
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            return false;
+        }
 
-                            if (method == DeviceCapabilityChecker.ScanMethod.ARCORE) {
-                                setupARCoreMode();
-                            } else if (method == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
-                                setupMLKitMode();
-                            } else if (method == DeviceCapabilityChecker.ScanMethod.NONE) {
-                                Toast.makeText(FaceScanActivity.this,
-                                        "Face scanning not supported on this device",
-                                        Toast.LENGTH_LONG).show();
-                                finish();
-                            }
-                        });
-                    }
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
+    };
 
-                    @Override
-                    public void onFaceDetected(FaceScanData faceScanData) {
-                        runOnUiThread(() -> {
-                            currentScanData = faceScanData;
-                            viewModel.processScanData(faceScanData);
-                            int pointCount = faceScanData.getPoints() != null ?
-                                    faceScanData.getPoints().size() : 0;
-                            binding.tvCameraStatus.setText("Face detected - " + pointCount + " points");
-                        });
-                    }
-
-                    @Override
-                    public void onFaceProcessingComplete(FaceScanData faceScanData) {
-                        runOnUiThread(() -> {
-                            currentScanData = faceScanData;
-                            viewModel.completeScan();
-                            binding.tvCameraStatus.setText("Scan complete!");
-                            binding.loadingProgress.setVisibility(View.GONE);
-                        });
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        runOnUiThread(() -> {
-                            viewModel.errorOccurred();
-                            binding.tvCameraStatus.setText("Error: " + error);
-                            binding.loadingProgress.setVisibility(View.GONE);
-                            Toast.makeText(FaceScanActivity.this, error, Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                });
-    }
-
-    private void setupARCoreMode() {
-        Log.d(TAG, "Setting up ARCore mode");
-
+    private void openCamera() {
+        CameraManager manager = (CameraManager) getSystemService(CAMERA_SERVICE);
         try {
-            binding.surfaceView.setVisibility(View.VISIBLE);
-            binding.cameraPreview.setVisibility(View.GONE);
+            String cameraId = getCameraId(manager);
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-            binding.surfaceView.setPreserveEGLContextOnPause(true);
-            binding.surfaceView.setEGLContextClientVersion(2);
-            binding.surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-            binding.surfaceView.setRenderer(this);
-            binding.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+            imageDimension = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                    .getOutputSizes(SurfaceTexture.class)[0];
 
-            setupARSession();
-
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to setup ARCore mode", e);
-            Toast.makeText(this,
-                    "ARCore setup failed. Switching to ML Kit mode.",
-                    Toast.LENGTH_LONG).show();
-
-            scanMethod = DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH;
-            binding.tvScanMethod.setText("MLKIT_FACE_MESH");
-            setupMLKitMode();
-        }
-    }
-
-    private void setupMLKitMode() {
-        Log.d(TAG, "Setting up ML Kit mode");
-
-        binding.surfaceView.setVisibility(View.GONE);
-        binding.cameraPreview.setVisibility(View.VISIBLE);
-
-        TextureView textureView = binding.textureView;
-
-        cameraHandler = new CameraHandler(this, textureView, new CameraHandler.CameraCallback() {
-            @Override
-            public void onImageCaptured(Bitmap bitmap) {
-                latestFrame = bitmap;
-
-                // Perform real-time face tracking
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastTrackingTime > TRACKING_INTERVAL) {
-                    lastTrackingTime = currentTime;
-                    trackFaceInRealtime(bitmap);
-                }
+            Size[] jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                    .getOutputSizes(ImageFormat.JPEG);
+            int width = 640;
+            int height = 480;
+            if (jpegSizes != null && jpegSizes.length > 0) {
+                width = jpegSizes[0].getWidth();
+                height = jpegSizes[0].getHeight();
             }
 
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    Toast.makeText(FaceScanActivity.this, error, Toast.LENGTH_SHORT).show();
-                    viewModel.errorOccurred();
-                });
+            if (imageReader != null) {
+                imageReader.close();
             }
-        });
 
-        // Configure overlay
-        binding.faceOverlay.setFrontCamera(true);
-
-        cameraHandler.startCamera(true); // Start with front camera
-        binding.tvCameraStatus.setText("Ready to capture");
-
-        Log.d(TAG, "ML Kit mode setup complete - camera started");
-    }
-
-    private void trackFaceInRealtime(Bitmap bitmap) {
-        if (bitmap == null) return;
-
-        InputImage image = InputImage.fromBitmap(bitmap, 0);
-
-        faceMeshDetector.process(image)
-                .addOnSuccessListener(faceMeshes -> {
-                    if (!faceMeshes.isEmpty()) {
-                        if (!isFaceDetected) {
-                            isFaceDetected = true;
-                            mainHandler.post(() -> {
-                                binding.tvFaceDetected.setVisibility(View.VISIBLE);
-                            });
-                        }
-
-                        // Draw face mesh on overlay
-                        FaceMesh faceMesh = faceMeshes.get(0);
-                        drawFaceMesh(faceMesh, bitmap.getWidth(), bitmap.getHeight());
-                    } else {
-                        if (isFaceDetected) {
-                            isFaceDetected = false;
-                            mainHandler.post(() -> {
-                                binding.tvFaceDetected.setVisibility(View.GONE);
-                                binding.faceOverlay.clear();
-                            });
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Face mesh detection failed", e);
-                });
-    }
-
-    private void drawFaceMesh(FaceMesh faceMesh, int imageWidth, int imageHeight) {
-        List<PointF> points = new ArrayList<>();
-        List<FaceOverlayView.Line> lines = new ArrayList<>();
-
-        // Get all face mesh points (468 points)
-        List<FaceMeshPoint> allPoints = faceMesh.getAllPoints();
-
-        // Convert PointF3D to PointF (we only need x, y for 2D display)
-        for (FaceMeshPoint point : allPoints) {
-            PointF3D position3D = point.getPosition();
-            // Convert PointF3D to PointF by taking only x and y coordinates
-            PointF position2D = new PointF(position3D.getX(), position3D.getY());
-            points.add(position2D);
-        }
-
-        // Create lines between connected points
-        for (int[] connection : faceConnections) {
-            if (connection.length == 2) {
-                int startIdx = connection[0];
-                int endIdx = connection[1];
-
-                if (startIdx < allPoints.size() && endIdx < allPoints.size()) {
-                    PointF3D start3D = allPoints.get(startIdx).getPosition();
-                    PointF3D end3D = allPoints.get(endIdx).getPosition();
-
-                    // Convert to 2D points
-                    PointF start = new PointF(start3D.getX(), start3D.getY());
-                    PointF end = new PointF(end3D.getX(), end3D.getY());
-
-                    lines.add(new FaceOverlayView.Line(start, end));
-                }
-            }
-        }
-
-        // Update overlay on main thread
-        mainHandler.post(() -> {
-            binding.faceOverlay.setImageDimensions(imageWidth, imageHeight);
-            binding.faceOverlay.setFrontCamera(cameraHandler.isFrontCamera());
-            binding.faceOverlay.setFaceData(points, lines);
-        });
-
-        Log.d(TAG, "Drew " + points.size() + " points and " + lines.size() + " lines");
-    }
-
-    private void setupARSession() {
-        if (arSession == null) {
-            try {
-                switch (ArCoreApk.getInstance().requestInstall(this, !installRequested)) {
-                    case INSTALL_REQUESTED:
-                        installRequested = true;
-                        return;
-                    case INSTALLED:
-                        break;
-                }
-
-                arSession = new Session(this);
-
-                Config config = new Config(arSession);
-                config.setAugmentedFaceMode(Config.AugmentedFaceMode.MESH3D);
-
+            imageReader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+            imageReader.setOnImageAvailableListener(reader -> {
+                Image image = null;
                 try {
-                    arSession.configure(config);
-                    Log.d(TAG, "ARCore session setup successful with MESH3D");
-                } catch (UnsupportedConfigurationException e) {
-                    Log.w(TAG, "Augmented Faces not supported, falling back to ML Kit", e);
-
-                    if (arSession != null) {
-                        arSession.close();
-                        arSession = null;
+                    image = reader.acquireLatestImage();
+                    if (image == null) {
+                        runOnUiThread(() -> {
+                            binding.btnStartScan.setEnabled(true);
+                            Toast.makeText(FaceScanActivity.this, "Failed to get image", Toast.LENGTH_SHORT).show();
+                        });
+                        return;
                     }
 
+                    ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                    byte[] bytes = new byte[buffer.capacity()];
+                    buffer.get(bytes);
+
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    if (bitmap == null) {
+                        runOnUiThread(() -> {
+                            binding.btnStartScan.setEnabled(true);
+                            Toast.makeText(FaceScanActivity.this, "Failed to decode image", Toast.LENGTH_SHORT).show();
+                        });
+                        return;
+                    }
+
+                    if (isFrontCamera) {
+                        bitmap = flipBitmap(bitmap);
+                    }
+
+                    final Bitmap finalBitmap = bitmap;
+                    runOnUiThread(() -> startProcessingAnimation(finalBitmap));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                     runOnUiThread(() -> {
-                        Toast.makeText(this,
-                                "ARCore face tracking not supported. Using ML Kit instead.",
-                                Toast.LENGTH_LONG).show();
-
-                        scanMethod = DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH;
-                        binding.tvScanMethod.setText("MLKIT_FACE_MESH");
-                        setupMLKitMode();
+                        binding.btnStartScan.setEnabled(true);
+                        Toast.makeText(FaceScanActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
-                    return;
+                } finally {
+                    if (image != null) {
+                        image.close();
+                    }
                 }
+            }, backgroundHandler);
 
-            } catch (UnavailableArcoreNotInstalledException
-                     | UnavailableUserDeclinedInstallationException e) {
-                Log.e(TAG, "ARCore not available", e);
-                Toast.makeText(this, "ARCore not available, using ML Kit", Toast.LENGTH_LONG).show();
-                scanMethod = DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH;
-                setupMLKitMode();
-            } catch (UnavailableApkTooOldException e) {
-                Toast.makeText(this, "Please update ARCore", Toast.LENGTH_LONG).show();
-                finish();
-            } catch (UnavailableSdkTooOldException e) {
-                Toast.makeText(this, "Please update this app", Toast.LENGTH_LONG).show();
-                finish();
-            } catch (Exception e) {
-                Log.e(TAG, "Error setting up AR session", e);
-                Toast.makeText(this, "Failed to setup AR session", Toast.LENGTH_LONG).show();
-                finish();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
+            manager.openCamera(cameraId, stateCallback, backgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getCameraId(CameraManager manager) throws CameraAccessException {
+        for (String cameraId : manager.getCameraIdList()) {
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+
+            if (isFrontCamera && facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                return cameraId;
+            } else if (!isFrontCamera && facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                return cameraId;
             }
         }
+        return manager.getCameraIdList()[0];
     }
 
-    private void setupObservers() {
-        viewModel.getScanState().observe(this, state -> {
-            switch (state) {
-                case IDLE:
-                    binding.btnStartScan.setVisibility(View.VISIBLE);
-                    binding.btnViewResult.setVisibility(View.GONE);
-                    binding.btnUpload.setVisibility(View.GONE);
-                    binding.loadingProgress.setVisibility(View.GONE);
-                    binding.btnStartScan.setEnabled(true);
-                    binding.btnStartScan.setText("Take Photo");
-                    break;
-                case SCANNING:
-                    binding.btnStartScan.setEnabled(false);
-                    binding.loadingProgress.setVisibility(View.VISIBLE);
-                    binding.tvCameraStatus.setText("Processing...");
-                    break;
-                case PROCESSING:
-                    binding.tvCameraStatus.setText("Analyzing face data...");
-                    break;
-                case COMPLETED:
-                    binding.loadingProgress.setVisibility(View.GONE);
-                    binding.btnViewResult.setVisibility(View.VISIBLE);
-                    binding.btnUpload.setVisibility(View.VISIBLE);
-                    binding.btnStartScan.setEnabled(true);
-                    binding.tvCameraStatus.setText("Scan completed!");
-                    break;
-                case ERROR:
-                    binding.loadingProgress.setVisibility(View.GONE);
-                    binding.btnStartScan.setEnabled(true);
-                    binding.tvCameraStatus.setText("Ready to capture");
-                    break;
-            }
-        });
-
-        viewModel.getUploadStatus().observe(this, status -> {
-            if (status != null) {
-                binding.tvCameraStatus.setText(status);
-                if (status.contains("successful")) {
-                    Toast.makeText(this, "Face scan uploaded successfully!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        viewModel.getError().observe(this, error -> {
-            if (error != null) {
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void setupUI() {
-        binding.btnStartScan.setOnClickListener(v -> captureAndProcessFace());
-        binding.btnViewResult.setOnClickListener(v -> viewScanResult());
-        binding.btnUpload.setOnClickListener(v -> uploadScanData());
-        binding.btnBack.setOnClickListener(v -> finish());
-        binding.btnSwitchCamera.setOnClickListener(v -> switchCamera());
-    }
-
-    private void switchCamera() {
-        if (cameraHandler != null) {
-            cameraHandler.switchCamera();
-            boolean isFront = cameraHandler.isFrontCamera();
-
-            // Update overlay for camera orientation
-            binding.faceOverlay.setFrontCamera(isFront);
-
-            Toast.makeText(this,
-                    isFront ? "Switched to front camera" : "Switched to back camera",
-                    Toast.LENGTH_SHORT).show();
-
-            // Clear face overlay when switching
-            binding.faceOverlay.clear();
-            isFaceDetected = false;
-            binding.tvFaceDetected.setVisibility(View.GONE);
-        }
-    }
-
-    private void captureAndProcessFace() {
-        if (!permissionGranted) {
-            Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
-            requestCameraPermission();
-            return;
+    private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
+        @Override
+        public void onOpened(@NonNull CameraDevice camera) {
+            cameraDevice = camera;
+            createCameraPreview();
         }
 
-        viewModel.startScanning();
-        binding.tvCameraStatus.setText("Capturing...");
-
-        if (scanMethod == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
-            if (latestFrame != null && faceProcessor != null && faceProcessor.getMlkitProcessor() != null) {
-                Log.d(TAG, "Processing captured frame");
-                faceProcessor.getMlkitProcessor().processImage(latestFrame);
-            } else {
-                Log.e(TAG, "No frame available or processor is null");
-                Toast.makeText(this, "Please wait for camera to initialize", Toast.LENGTH_SHORT).show();
-                viewModel.errorOccurred();
-            }
-        } else if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
-            Log.d(TAG, "ARCore face capture triggered");
+        @Override
+        public void onDisconnected(@NonNull CameraDevice camera) {
+            cameraDevice.close();
         }
-    }
 
-    private void viewScanResult() {
-        if (currentScanData != null) {
-            Intent intent = new Intent(this, ScanResultActivity.class);
-            intent.putExtra("scan_data", (Parcelable) currentScanData);
-            startActivity(intent);
+        @Override
+        public void onError(@NonNull CameraDevice camera, int error) {
+            cameraDevice.close();
+            cameraDevice = null;
         }
-    }
+    };
 
-    private void uploadScanData() {
-        if (currentScanData != null) {
-            viewModel.uploadScanData(currentScanData);
-        } else {
-            Toast.makeText(this, "No scan data available", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    private void createCameraPreview() {
         try {
-            if (arSession != null) {
-                arSession.setCameraTextureName(0);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to set camera texture name", e);
+            SurfaceTexture texture = binding.textureView.getSurfaceTexture();
+            texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
+
+            Surface surface = new Surface(texture);
+            captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            captureRequestBuilder.addTarget(surface);
+
+            cameraDevice.createCaptureSession(Arrays.asList(surface, imageReader.getSurface()), new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(@NonNull CameraCaptureSession session) {
+                    if (cameraDevice == null) return;
+
+                    cameraCaptureSession = session;
+                    updatePreview();
+                }
+
+                @Override
+                public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                    Toast.makeText(FaceScanActivity.this, "Configuration failed", Toast.LENGTH_SHORT).show();
+                }
+            }, null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
         }
     }
 
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
-        if (arSession != null) {
-            arSession.setDisplayGeometry(getWindowManager().getDefaultDisplay().getRotation(), width, height);
+    private void updatePreview() {
+        if (cameraDevice == null) return;
+
+        captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+        try {
+            cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, backgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
         }
     }
 
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-        if (arSession == null || scanMethod != DeviceCapabilityChecker.ScanMethod.ARCORE) {
-            return;
-        }
+    private void captureImage() {
+        if (cameraDevice == null) return;
 
         try {
-            arSession.setCameraTextureName(0);
-            Frame frame = arSession.update();
+            binding.btnStartScan.setEnabled(false);
+            binding.tvCameraStatus.setText("Capturing...");
 
-            if (viewModel.getScanState().getValue() == FaceScanViewModel.ScanState.SCANNING) {
-                Collection<AugmentedFace> faces = arSession.getAllTrackables(AugmentedFace.class);
-                if (!faces.isEmpty() && faceProcessor != null && faceProcessor.getArProcessor() != null) {
-                    faceProcessor.getArProcessor().processAugmentedFaces(faces);
+            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            captureBuilder.addTarget(imageReader.getSurface());
+            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
+
+            cameraCaptureSession.stopRepeating();
+            cameraCaptureSession.abortCaptures();
+
+            cameraCaptureSession.capture(captureBuilder.build(), new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                               @NonNull CaptureRequest request,
+                                               @NonNull TotalCaptureResult result) {
+                    super.onCaptureCompleted(session, request, result);
+                    runOnUiThread(() -> {
+                        binding.tvCameraStatus.setText("Image captured!");
+                    });
                 }
-            }
 
-        } catch (Exception e) {
-            Log.e(TAG, "Error in onDrawFrame", e);
+                @Override
+                public void onCaptureFailed(@NonNull CameraCaptureSession session,
+                                            @NonNull CaptureRequest request,
+                                            @NonNull CaptureFailure failure) {
+                    super.onCaptureFailed(session, request, failure);
+                    runOnUiThread(() -> {
+                        binding.btnStartScan.setEnabled(true);
+                        binding.tvCameraStatus.setText("Capture failed, try again");
+                        Toast.makeText(FaceScanActivity.this, "Capture failed", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }, backgroundHandler);
+
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+            binding.btnStartScan.setEnabled(true);
+            binding.tvCameraStatus.setText("Error occurred");
+        }
+    }
+
+    private Bitmap flipBitmap(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        matrix.preScale(-1.0f, 1.0f);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    private int getOrientation(int rotation) {
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                return isFrontCamera ? 270 : 90;
+            case Surface.ROTATION_90:
+                return 0;
+            case Surface.ROTATION_180:
+                return isFrontCamera ? 90 : 270;
+            case Surface.ROTATION_270:
+                return 180;
+            default:
+                return 90;
+        }
+    }
+
+    private void startProcessingAnimation(Bitmap capturedImage) {
+        isScanning = true;
+        binding.btnStartScan.setEnabled(false);
+        binding.loadingProgress.setVisibility(View.VISIBLE);
+        binding.tvCameraStatus.setText("Processing face data...");
+        binding.tvScanMethod.setText("ANALYZING");
+
+        binding.faceOverlay.startScanAnimation();
+
+        new Handler().postDelayed(() -> {
+            binding.faceOverlay.stopScanAnimation();
+            startSendingAnimation(capturedImage);
+        }, 2500);
+    }
+
+    private void startSendingAnimation(Bitmap capturedImage) {
+        binding.tvCameraStatus.setText("Sending data to server...");
+        binding.tvScanMethod.setText("UPLOADING");
+        binding.loadingProgress.setVisibility(View.VISIBLE);
+
+        new Handler().postDelayed(() -> {
+            uploadFaceScan(capturedImage);
+        }, 1500);
+    }
+
+    private void uploadFaceScan(Bitmap bitmap) {
+        String base64Image = bitmapToBase64(bitmap);
+
+        FaceScanData faceScanData = new FaceScanData();
+        faceScanData.setImage(base64Image);
+        faceScanData.setTimestamp(System.currentTimeMillis());
+
+        RetrofitClient.getInstance().getApiService()
+                .uploadFaceScan(faceScanData)
+                .enqueue(new Callback<ApiResponse>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                        isScanning = false;
+                        binding.loadingProgress.setVisibility(View.GONE);
+
+                        Intent intent = new Intent(FaceScanActivity.this, FaceScanResultActivity.class);
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse result = response.body();
+                            intent.putExtra("success", true);
+                            intent.putExtra("healthy", result.isHealthy());
+                            intent.putExtra("message", result.getMessage());
+                            intent.putExtra("confidence", result.getConfidence());
+                            if (result.getConditions() != null) {
+                                intent.putStringArrayListExtra("conditions", new ArrayList<>(result.getConditions()));
+                            }
+                            if (result.getRecommendations() != null) {
+                                intent.putStringArrayListExtra("recommendations", new ArrayList<>(result.getRecommendations()));
+                            }
+                        } else {
+                            intent.putExtra("success", false);
+                            intent.putExtra("error", "Server returned error code: " + response.code());
+                        }
+
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse> call, Throwable t) {
+                        isScanning = false;
+                        binding.loadingProgress.setVisibility(View.GONE);
+
+                        Intent intent = new Intent(FaceScanActivity.this, FaceScanResultActivity.class);
+                        intent.putExtra("success", false);
+
+                        String errorMsg = "Connection error";
+                        if (t.getMessage() != null) {
+                            if (t.getMessage().contains("Unable to resolve host") ||
+                                    t.getMessage().contains("Failed to connect")) {
+                                errorMsg = "Cannot connect to server. Please check:\n• Backend server is running\n• Network connection\n• IP address is correct";
+                            } else if (t.getMessage().contains("timeout")) {
+                                errorMsg = "Connection timeout. Server might be slow or unreachable.";
+                            } else {
+                                errorMsg = t.getMessage();
+                            }
+                        }
+
+                        intent.putExtra("error", errorMsg);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+    }
+
+    private String bitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+    private void simulateFaceDetection() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isScanning) {
+                    faceDetected = !faceDetected;
+
+                    if (faceDetected) {
+                        binding.tvFaceDetected.setVisibility(View.VISIBLE);
+                        binding.tvScanMethod.setText("FACE LOCK");
+                        binding.faceOverlay.setFaceDetected(true);
+
+                        AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+                        fadeIn.setDuration(300);
+                        binding.tvFaceDetected.startAnimation(fadeIn);
+                    } else {
+                        binding.tvFaceDetected.setVisibility(View.GONE);
+                        binding.tvScanMethod.setText("DETECTING...");
+                        binding.faceOverlay.setFaceDetected(false);
+                    }
+                }
+
+                new Handler().postDelayed(this, 2000);
+            }
+        }, 1000);
+    }
+
+    private void closeCamera() {
+        if (cameraCaptureSession != null) {
+            cameraCaptureSession.close();
+            cameraCaptureSession = null;
+        }
+        if (cameraDevice != null) {
+            cameraDevice.close();
+            cameraDevice = null;
+        }
+        if (imageReader != null) {
+            imageReader.close();
+            imageReader = null;
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
-            if (arSession != null) {
-                try {
-                    arSession.resume();
-                } catch (CameraNotAvailableException e) {
-                    Log.e(TAG, "Camera not available", e);
-                    arSession = null;
-                }
-            }
-            binding.surfaceView.onResume();
-        } else if (scanMethod == DeviceCapabilityChecker.ScanMethod.MLKIT_FACE_MESH) {
-            if (cameraHandler != null) {
-                cameraHandler.startCamera(cameraHandler.isFrontCamera());
-            }
+        startBackgroundThread();
+        if (binding.textureView.isAvailable()) {
+            openCamera();
+        } else {
+            binding.textureView.setSurfaceTextureListener(textureListener);
         }
     }
 
     @Override
     protected void onPause() {
+        closeCamera();
+        stopBackgroundThread();
         super.onPause();
+    }
 
-        if (scanMethod == DeviceCapabilityChecker.ScanMethod.ARCORE) {
-            if (arSession != null) {
-                arSession.pause();
+    private void startBackgroundThread() {
+        backgroundThread = new HandlerThread("Camera Background");
+        backgroundThread.start();
+        backgroundHandler = new Handler(backgroundThread.getLooper());
+    }
+
+    private void stopBackgroundThread() {
+        if (backgroundThread != null) {
+            backgroundThread.quitSafely();
+            try {
+                backgroundThread.join();
+                backgroundThread = null;
+                backgroundHandler = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            binding.surfaceView.onPause();
         }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (arSession != null) {
-            arSession.close();
-            arSession = null;
-        }
-
-        if (cameraHandler != null) {
-            cameraHandler.stopCamera();
-        }
-
-        if (faceProcessor != null) {
-            faceProcessor.cleanup();
-        }
-
-        if (faceMeshDetector != null) {
-            faceMeshDetector.close();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startCamera();
+            } else {
+                Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
     }
 }

@@ -29,6 +29,12 @@ android {
             name = "OPENAI_API_KEY",
             value = "\"${properties.getProperty("OPENAI_API_KEY", "")}\""
         )
+
+        buildConfigField(
+            type = "String",
+            name = "FACETRACKER_API_BASE_URL",
+            value = "\"${properties.getProperty("FACETRACKER_API_BASE_URL", "")}\""
+        )
     }
 
     buildTypes {

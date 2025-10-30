@@ -221,9 +221,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
         Runnable autoLaunch = () -> {
             if (dialog.isShowing()) {
                 dialog.dismiss();
-                Intent intent = new Intent(this, SecondActivity.class);
-                startActivity(intent);
-                finish();
+                activateEmergencyService();
             }
         };
 
@@ -236,8 +234,8 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
             dialog.dismiss();
         });
 
-        //TO BE REPLACED WITH EMERGENCY ACTIVITY
         confirmBtn.setOnClickListener(v -> {
+            dialog.dismiss();
             activateEmergencyService();
         });
     }

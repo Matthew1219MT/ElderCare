@@ -9,6 +9,9 @@ public class FaceScanData {
     @SerializedName("timestamp")
     private long timestamp;
 
+    @SerializedName("language")
+    private String language;
+
     public FaceScanData() {}
 
     public String getImage() {
@@ -25,5 +28,13 @@ public class FaceScanData {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

@@ -33,6 +33,7 @@ import com.eldercare.eldercare.model.FaceScanData;
 import com.eldercare.eldercare.network.RetrofitClient;
 import com.eldercare.eldercare.repository.FaceScanRepository.ApiResponse;
 import com.eldercare.eldercare.utils.FaceOverlayView;
+import com.eldercare.eldercare.utils.LocaleHelper;
 import com.eldercare.eldercare.view.BaseActivity;
 
 import retrofit2.Call;
@@ -374,12 +375,33 @@ public class FaceScanActivity extends BaseActivity {
         }, 1500);
     }
 
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        float ratioBitmap = (float) width / (float) height;
+        float ratioMax = (float) maxWidth / (float) maxHeight;
+
+        int finalWidth = maxWidth;
+        int finalHeight = maxHeight;
+
+        if (ratioMax > ratioBitmap) {
+            finalWidth = (int) ((float)maxHeight * ratioBitmap);
+        } else {
+            finalHeight = (int) ((float)maxWidth / ratioBitmap);
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, finalWidth, finalHeight, true);
+    }
+
     private void uploadFaceScan(Bitmap bitmap) {
         String base64Image = bitmapToBase64(bitmap);
 
         FaceScanData faceScanData = new FaceScanData();
         faceScanData.setImage(base64Image);
         faceScanData.setTimestamp(System.currentTimeMillis());
+        String languageCode = LocaleHelper.getLanguage(this);
+        faceScanData.setLanguage(languageCode != null ? languageCode : "en");
 
         RetrofitClient.getInstance().getApiService()
                 .uploadFaceScan(faceScanData)
@@ -440,8 +462,10 @@ public class FaceScanActivity extends BaseActivity {
     }
 
     private String bitmapToBase64(Bitmap bitmap) {
+        Bitmap resizedBitmap = resizeBitmap(bitmap, 480, 640);
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }

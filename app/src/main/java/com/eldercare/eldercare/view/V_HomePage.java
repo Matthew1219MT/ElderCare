@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -47,6 +48,9 @@ public class V_HomePage extends BaseActivity implements SensorEventListener {
     private CardView facialAnalysis, emergency, emergServices, aiDoctor;
     private VM_HomePage viewModel;
     private ImageButton btnLanguage; // Language switcher button
+    private static final String PREFS_NAME = "user_prefs";
+    private static final String KEY_LANGUAGE_SELECTED = "language_selected_manual";
+
 
     private TextView emergencyCardText;
     private boolean emergencyIsPressed = false;
@@ -84,7 +88,31 @@ public class V_HomePage extends BaseActivity implements SensorEventListener {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == 101){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                detectLocationAndSetLanguage();
+                recreate();
+            } else {
+                LocaleHelper.setLocale(this, LocaleHelper.LANGUAGE_ENGLISH);
+            }
+        }
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean manualSelected = prefs.getBoolean(KEY_LANGUAGE_SELECTED, false);
+
+        if(!manualSelected){
+            detectLocationAndSetLanguage();
+        } else {
+            String lang = LocaleHelper.getLanguage(this);
+            LocaleHelper.setLocale(this, lang);
+        }
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -201,6 +229,11 @@ public class V_HomePage extends BaseActivity implements SensorEventListener {
             if (!selectedLanguage.equals(currentLanguage)) {
                 // Save and apply new language
                 LocaleHelper.setLocale(this, selectedLanguage);
+                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                editor.putBoolean(KEY_LANGUAGE_SELECTED, true);
+                editor.apply();
+                recreate();
+
 
                 // Show confirmation
                 Toast.makeText(this, R.string.language_changed, Toast.LENGTH_SHORT).show();
@@ -330,4 +363,35 @@ public class V_HomePage extends BaseActivity implements SensorEventListener {
         ));
         startActivity(smsIntent);
     }
+
+    private void detectLocationAndSetLanguage() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    101);
+            return;
+        }
+
+        android.location.LocationManager locationManager =
+                (android.location.LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        android.location.Location location = locationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
+        if(location != null){
+            setLanguageByLocation(location.getLatitude(), location.getLongitude());
+        } else {
+            LocaleHelper.setLocale(this, LocaleHelper.LANGUAGE_ENGLISH);
+        }
+    }
+
+    private void setLanguageByLocation(double latitude, double longitude){
+        boolean isInIndonesia = latitude >= -11.0 && latitude <= 6.0 && longitude >= 95.0 && longitude <= 141.0;
+
+        if(isInIndonesia){
+            LocaleHelper.setLocale(this, LocaleHelper.LANGUAGE_INDONESIAN);
+        } else {
+            LocaleHelper.setLocale(this, LocaleHelper.LANGUAGE_ENGLISH);
+        }
+    }
+
 }

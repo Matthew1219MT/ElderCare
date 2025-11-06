@@ -16,6 +16,28 @@
     <string name="fall_detect_notif_title">Fall Detected!</string>
     <string name="fall_detect_notif_content">Please press on this notification to open Eldercare or dismiss if this is a false fall trigger.</string>
 
+    <!-- Missing strings for activity_main.xml -->
+    <string name="change_language">Change Language</string>
+    <string name="home">Home</string>
+    <string name="welcome_text">Welcome to ElderCare</string>
+    <string name="services">Services</string>
+    <string name="facial_analysis">Facial Analysis</string>
+    <string name="sos">SOS</string>
+    <string name="emergency_services">Emergency Services</string>
+    <string name="ai_doctor">AI Doctor</string>
+
+    <!-- Missing strings for V_HomePage.java -->
+    <string name="emergency">Emergency</string>
+    <string name="emergency_activating">Activating emergency services...</string>
+    <string name="keep_pressing">Keep pressing (%d seconds remaining)</string>
+    <string name="temp_sensor_unavailable">Temperature sensor unavailable on this device</string>
+    <string name="select_language">Select Language</string>
+    <string name="english">English</string>
+    <string name="indonesian">Indonesian</string>
+    <string name="language_changed">Language changed successfully</string>
+    <string name="cancel">Cancel</string>
+    <string name="emergency_sms_body">EMERGENCY! I need help. This is an automated message from ElderCare app. Please check on me immediately.</string>
+
     <!-- Face Scan Activity -->
     <string name="face_scan_title">FACE SCAN</string>
     <string name="scan_status_position">Position your face in the frame</string>
@@ -26,8 +48,9 @@
     <string name="scan_status_error">Error: %s</string>
 
     <string name="btn_start_scan">START SCAN</string>
-    <string name="btn_view_result">VIEW 3D</string>
-    <string name="btn_upload">UPLOAD</string>
+    <string name="btn_take_photo">Take Photo</string>
+    <string name="btn_view_result">View Result</string>
+    <string name="btn_upload">Upload</string>
     <string name="btn_back">Back</string>
 
     <!-- Scan Result Activity -->
@@ -35,15 +58,17 @@
     <string name="scan_info_format">Scan ID: %s\nVertices: %d\nTriangles: %d</string>
     <string name="scan_info_loading">Loading scan data...</string>
 
+    <!-- Buttons for scan result -->
     <string name="btn_rotate_up">Rotate Up</string>
     <string name="btn_rotate_down">Rotate Down</string>
     <string name="btn_rotate_left">Rotate Left</string>
     <string name="btn_rotate_right">Rotate Right</string>
     <string name="btn_reset">Reset View</string>
-
-    <string name="btn_wireframe">WIREFRAME</string>
-    <string name="btn_solid">SOLID</string>
-    <string name="btn_export">EXPORT</string>
+    <string name="btn_wireframe">Wireframe</string>
+    <string name="btn_solid">Solid</string>
+    <string name="btn_export">Export</string>
+    <string name="btn_scan_again">Scan Again</string>
+    <string name="btn_go_home">Go Home</string>
 
     <string name="controls_title">CONTROLS</string>
     <string name="controls_instructions">• Touch &amp; drag to rotate\n• Pinch to zoom\n• Use arrow buttons for precise control</string>
@@ -69,11 +94,30 @@
     <string name="upload_failed">Upload failed: %s</string>
     <string name="network_error">Network error: %s</string>
 
+    <!-- Result Card -->
+    <string name="scan_success_title">Healthy Face Scan</string>
+    <string name="scan_success_message">Your facial analysis looks great!</string>
+    <string name="confidence_text">Confidence: %1$.1f%%</string>
+
+    <!-- Conditions -->
+    <string name="detected_conditions">Detected Conditions</string>
+    <string name="sample_conditions">• Condition 1\n• Condition 2</string>
+
+    <!-- Recommendations -->
+    <string name="recommendations">Recommendations</string>
+    <string name="sample_recommendations">• Recommendation 1\n• Recommendation 2</string>
+
+    <!-- Error Card -->
+    <string name="error_title">Error Occurred</string>
+    <string name="error_message">A connection error occurred</string>
+
     <!-- Content Descriptions for Accessibility -->
-    <string name="cd_back_button">Back</string>
-    <string name="cd_rotate_up">Rotate Up</string>
-    <string name="cd_rotate_down">Rotate Down</string>
-    <string name="cd_rotate_left">Rotate Left</string>
-    <string name="cd_rotate_right">Rotate Right</string>
-    <string name="cd_reset_view">Reset View</string>
+    <string name="back_button_desc">Back</string>
+    <string name="logo_desc">ElderCare Logo</string>
+    <string name="face_scan_guide_desc">Face scan guide</string>
+    <string name="switch_camera_desc">Switch Camera</string>
+    <string name="face_position_text">Position your face in the frame</string>
+    <string name="face_detected_text">Face Detected ✓</string>
+    <string name="method_label">Method: </string>
+    <string name="detecting_text">DETECTING...</string>
 </resources>

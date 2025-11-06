@@ -51,4 +51,32 @@
     <color name="success_light">#E8F5E9</color>
     <color name="warning_light">#FFF3E0</color>
     <color name="error_light">#FFEBEE</color>
+
+    <!-- Backgrounds -->
+    <color name="bg_main">#D9D4CC</color>
+    <color name="overlay_black">#80000000</color>
+    <color name="gradient_bottom">#BF5F56</color>
+
+    <!-- Buttons -->
+    <color name="red_dark">#BF5F56</color>
+
+    <!-- Text Colors -->
+    <color name="gray">#888888</color>
+    <color name="cyan">#00E5FF</color>
+    <color name="green">#00FF00</color>
+
+    <!-- Progress bar -->
+    <color name="progress_red">#BF5F56</color>
+
+    <!-- Success -->
+    <color name="green_light">#E8F5E9</color>
+    <color name="green_dark">#4CAF50</color>
+
+    <!-- Error -->
+    <color name="orange_dark">#FF9800</color>
+
+    <!-- Gray scale -->
+    <color name="gray_dark">#333333</color>
+    <color name="gray_mid">#666666</color>
+    <color name="gray_light">#888888</color>
 </resources>

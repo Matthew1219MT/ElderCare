@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="request_emgy_svc_btn">Minta Layanan Darurat</string>
+    <string name="emgy_svcs_label">Layanan Darurat Tersedia di Sekitar</string>
+    <string name="app_name">ElderCare</string>
+
+    <!-- Main Activity -->
+    <string name="main_title">ELDERCARE</string>
+    <string name="main_subtitle">Pemindai Wajah 3D</string>
+    <string name="start_face_scan">MULAI PEMINDAIAN WAJAH</string>
+    <string name="scan_instructions">• Pastikan pencahayaan baik\n• Posisikan wajah di tengah\n• Pegang perangkat tetap</string>
+    <string name="channel_name">fall_detection_channel</string>
+    <string name="channel_description">Saluran untuk menampilkan notifikasi saat terjadi jatuh</string>
+    <string name="opening_notif_title">Deteksi Jatuh Aktif</string>
+    <string name="opening_notif_content">ElderCare akan memantau jatuh di latar belakang</string>
+    <string name="fall_detect_notif_title">Terjadi Jatuh!</string>
+    <string name="fall_detect_notif_content">Silakan tekan notifikasi ini untuk membuka ElderCare atau abaikan jika ini false alarm.</string>
+
+    <!-- Missing strings for activity_main.xml -->
+    <string name="change_language">Ganti Bahasa</string>
+    <string name="home">Beranda</string>
+    <string name="welcome_text">Selamat datang di ElderCare</string>
+    <string name="services">Layanan</string>
+    <string name="facial_analysis">Analisis Wajah</string>
+    <string name="sos">SOS</string>
+    <string name="emergency_services">Layanan Darurat</string>
+    <string name="ai_doctor">Dokter AI</string>
+
+    <!-- Missing strings for V_HomePage.java -->
+    <string name="emergency">Darurat</string>
+    <string name="emergency_activating">Mengaktifkan layanan darurat...</string>
+    <string name="keep_pressing">Terus tekan (%d detik tersisa)</string>
+    <string name="temp_sensor_unavailable">Sensor suhu tidak tersedia di perangkat ini</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="english">Inggris</string>
+    <string name="indonesian">Indonesia</string>
+    <string name="language_changed">Bahasa berhasil diubah</string>
+    <string name="cancel">Batal</string>
+    <string name="emergency_sms_body">DARURAT! Saya butuh bantuan. Ini adalah pesan otomatis dari aplikasi ElderCare. Mohon segera diperiksa.</string>
+
+    <!-- Face Scan Activity -->
+    <string name="face_scan_title">PEMINDAIAN WAJAH</string>
+    <string name="scan_status_position">Posisikan wajah Anda di dalam bingkai</string>
+    <string name="scan_status_scanning">Memindai wajah...</string>
+    <string name="scan_status_processing">Memproses data pemindaian...</string>
+    <string name="scan_status_completed">Pemindaian berhasil!</string>
+    <string name="scan_status_detected">Wajah terdeteksi - %d titik</string>
+    <string name="scan_status_error">Kesalahan: %s</string>
+
+    <string name="btn_start_scan">MULAI PEMINDAIAN</string>
+    <string name="btn_take_photo">Ambil Foto</string>
+    <string name="btn_view_result">Lihat Hasil</string>
+    <string name="btn_upload">Unggah</string>
+    <string name="btn_back">Kembali</string>
+
+    <!-- Scan Result Activity -->
+    <string name="scan_result_title">HASIL PEMINDAIAN 3D</string>
+    <string name="scan_info_format">ID Pemindaian: %s\nVertices: %d\nSegitiga: %d</string>
+    <string name="scan_info_loading">Memuat data pemindaian...</string>
+
+    <!-- Buttons for scan result -->
+    <string name="btn_rotate_up">Putar ke Atas</string>
+    <string name="btn_rotate_down">Putar ke Bawah</string>
+    <string name="btn_rotate_left">Putar ke Kiri</string>
+    <string name="btn_rotate_right">Putar ke Kanan</string>
+    <string name="btn_reset">Reset Tampilan</string>
+    <string name="btn_wireframe">Wireframe</string>
+    <string name="btn_solid">Solid</string>
+    <string name="btn_export">Ekspor</string>
+    <string name="btn_scan_again">Pindai Lagi</string>
+    <string name="btn_go_home">Kembali ke Beranda</string>
+
+    <string name="controls_title">KONTROL</string>
+    <string name="controls_instructions">• Sentuh &amp; seret untuk memutar\n• Cubit untuk zoom\n• Gunakan tombol panah untuk kontrol tepat</string>
+
+    <!-- Messages -->
+    <string name="camera_permission_required">Izin kamera dibutuhkan untuk pemindaian wajah</string>
+    <string name="arcore_required">ARCore dibutuhkan untuk pemindaian wajah</string>
+    <string name="arcore_update_required">Harap perbarui ARCore</string>
+    <string name="app_update_required">Harap perbarui aplikasi ini</string>
+    <string name="ar_session_failed">Gagal menyiapkan sesi AR</string>
+    <string name="camera_not_available">Kamera tidak tersedia</string>
+    <string name="no_scan_data">Tidak ada data pemindaian tersedia</string>
+    <string name="face_scan_uploaded">Pemindaian wajah berhasil diunggah!</string>
+
+    <!-- Error Messages -->
+    <string name="error_insufficient_face_data">Data wajah tidak cukup. Pastikan pencahayaan baik dan hadapi kamera langsung.</string>
+    <string name="error_processing_face">Gagal memproses data wajah: %s</string>
+    <string name="error_invalid_scan_data">Data pemindaian tidak valid</string>
+
+    <!-- API Messages -->
+    <string name="uploading">Mengunggah...</string>
+    <string name="upload_successful">Unggahan berhasil</string>
+    <string name="upload_failed">Unggahan gagal: %s</string>
+    <string name="network_error">Kesalahan jaringan: %s</string>
+
+    <!-- Result Card -->
+    <string name="scan_success_title">Pemindaian Wajah Sehat</string>
+    <string name="scan_success_message">Analisis wajah Anda terlihat baik!</string>
+    <string name="confidence_text">Tingkat Kepercayaan: %1$.1f%%</string>
+
+    <!-- Conditions -->
+    <string name="detected_conditions">Kondisi Terdeteksi</string>
+    <string name="sample_conditions">• Kondisi 1\n• Kondisi 2</string>
+
+    <!-- Recommendations -->
+    <string name="recommendations">Rekomendasi</string>
+    <string name="sample_recommendations">• Rekomendasi 1\n• Rekomendasi 2</string>
+
+    <!-- Error Card -->
+    <string name="error_title">Terjadi Kesalahan</string>
+    <string name="error_message">Terjadi kesalahan koneksi</string>
+
+    <!-- Content Descriptions for Accessibility -->
+    <string name="back_button_desc">Kembali</string>
+    <string name="logo_desc">Logo ElderCare</string>
+    <string name="face_scan_guide_desc">Panduan pemindaian wajah</string>
+    <string name="switch_camera_desc">Ganti Kamera</string>
+    <string name="face_position_text">Posisikan wajah Anda di bingkai</string>
+    <string name="face_detected_text">Wajah Terdeteksi ✓</string>
+    <string name="method_label">Metode: </string>
+    <string name="detecting_text">MENDETEKSI...</string>
+</resources>

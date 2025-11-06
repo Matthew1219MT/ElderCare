@@ -33,6 +33,8 @@ import com.eldercare.eldercare.model.FaceScanData;
 import com.eldercare.eldercare.network.RetrofitClient;
 import com.eldercare.eldercare.repository.FaceScanRepository.ApiResponse;
 import com.eldercare.eldercare.utils.FaceOverlayView;
+import com.eldercare.eldercare.view.BaseActivity;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,7 +43,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class FaceScanActivity extends AppCompatActivity {
+public class FaceScanActivity extends BaseActivity {
     private ActivityFaceScanBinding binding;
     private static final int CAMERA_PERMISSION_CODE = 100;
 

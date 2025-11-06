@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat;
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.databinding.ActivityEmergencyBinding;
 import com.eldercare.eldercare.model.Hospital;
+import com.eldercare.eldercare.view.BaseActivity;
 import com.eldercare.eldercare.view.V_HomePage;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -58,7 +59,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmergencyActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class EmergencyActivity extends BaseActivity implements OnMapReadyCallback {
     private ActivityEmergencyBinding binding;
 
     private FusedLocationProviderClient fusedLocationClient;

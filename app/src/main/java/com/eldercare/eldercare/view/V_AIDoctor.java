@@ -12,7 +12,7 @@ import com.eldercare.eldercare.fragment.F_AIDoctorReply;
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.viewmodel.VM_AIDoctor;
 
-public class V_AIDoctor extends AppCompatActivity {
+public class V_AIDoctor extends BaseActivity  {
 
     Fragment DisclaimerFragment = new F_AIDoctorDisclaimer();
     Fragment QueryFragment = new F_AIDoctorQuery();

@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,9 +34,10 @@ import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.activity.EmergencyActivity;
 import com.eldercare.eldercare.activity.FaceScanActivity;
 import com.eldercare.eldercare.service.FallDetectionService;
+import com.eldercare.eldercare.utils.LocaleHelper;
 import com.eldercare.eldercare.viewmodel.VM_HomePage;
 
-public class V_HomePage extends AppCompatActivity implements SensorEventListener {
+public class V_HomePage extends BaseActivity implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor lightSensor;
@@ -44,6 +46,7 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
     private float temperature;
     private CardView facialAnalysis, emergency, emergServices, aiDoctor;
     private VM_HomePage viewModel;
+    private ImageButton btnLanguage; // Language switcher button
 
     private TextView emergencyCardText;
     private boolean emergencyIsPressed = false;
@@ -58,14 +61,14 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
                 int remaining = (int) Math.max((triggerRequiredHoldingTime - elapsed) / 1000, 0);
 
                 if (elapsed >= triggerRequiredHoldingTime) {
-                    emergencyCardText.setText("Emergency");
+                    emergencyCardText.setText(R.string.emergency);
                     emergency.setCardBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-                    Toast.makeText(V_HomePage.this, "Emergency Calling Activating!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(V_HomePage.this, R.string.emergency_activating, Toast.LENGTH_SHORT).show();
                     activateEmergencyService();
                     emergencyIsPressed = false;
                     emergency.setCardBackgroundColor(Color.parseColor("#BF5F56"));
                 } else {
-                    emergencyCardText.setText("Keep pressing " + remaining + "s more to activate the emergency calling");
+                    emergencyCardText.setText(getString(R.string.keep_pressing, remaining));
                     handler.postDelayed(this, 1000);
                 }
             }
@@ -73,34 +76,61 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
     };
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        // Apply saved language before creating activity
+        String languageCode = LocaleHelper.getLanguage(newBase);
+        Context context = LocaleHelper.setLocale(newBase, languageCode);
+        super.attachBaseContext(context);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        // Initialize sensors
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-        if(tempSensor == null) Toast.makeText(this, "Temperature Senor is not available", Toast.LENGTH_LONG).show();
+        if(tempSensor == null) {
+            Toast.makeText(this, R.string.temp_sensor_unavailable, Toast.LENGTH_LONG).show();
+        }
         lightLevel = -1.0f;
         temperature = -1.0f;
 
+        // Initialize UI elements
         facialAnalysis = findViewById(R.id.facial_analysis_btn);
         emergency = findViewById(R.id.emergency_btn);
         emergencyCardText = findViewById(R.id.emergencyCardText);
         emergServices = findViewById(R.id.emergency_services);
         aiDoctor = findViewById(R.id.ai_doctor_btn);
-        facialAnalysis.setOnClickListener(v->{
+        btnLanguage = findViewById(R.id.btn_language); // Language button
+
+        // Setup click listeners
+        setupClickListeners();
+        setupLanguageSwitcher();
+
+        // ViewModel setup
+        viewModel = new ViewModelProvider(this).get(VM_HomePage.class);
+        observeViewModel();
+        checkNotificationPermissions();
+        viewModel.handleIntent(getIntent());
+    }
+
+    private void setupClickListeners() {
+        facialAnalysis.setOnClickListener(v -> {
             Intent intent = new Intent(this, FaceScanActivity.class);
             startActivity(intent);
         });
+
         GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                //startActivity(new Intent(V_HomePage.this, EmergencyActivity.class));
                 return true;
             }
         });
+
         emergency.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
 
@@ -115,26 +145,79 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
                 case MotionEvent.ACTION_CANCEL:
                     emergencyIsPressed = false;
                     handler.removeCallbacks(updateCountdown);
-                    emergencyCardText.setText("SOS");
+                    emergencyCardText.setText(R.string.sos);
                     return true;
             }
 
             return false;
         });
+
         emergServices.setOnClickListener(v -> {
             startActivity(new Intent(this, EmergencyActivity.class));
         });
-        aiDoctor.setOnClickListener(v->{
+
+        aiDoctor.setOnClickListener(v -> {
             Intent intent = new Intent(this, V_AIDoctor.class);
             startActivity(intent);
         });
-
-        viewModel = new ViewModelProvider(this).get(VM_HomePage.class);
-        observeViewModel();
-        checkNotificationPermissions();
-        viewModel.handleIntent(getIntent());
     }
 
+    private void setupLanguageSwitcher() {
+        if (btnLanguage != null) {
+            // Update button icon based on current language
+            updateLanguageButton();
+
+            btnLanguage.setOnClickListener(v -> {
+                showLanguageDialog();
+            });
+        }
+    }
+
+    private void updateLanguageButton() {
+        String currentLanguage = LocaleHelper.getLanguage(this);
+        // Update button appearance based on language
+        // You can change the icon or add a text indicator
+    }
+
+    private void showLanguageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.select_language);
+
+        String currentLanguage = LocaleHelper.getLanguage(this);
+        final String[] languages = {
+                getString(R.string.english),
+                getString(R.string.indonesian)
+        };
+        final String[] languageCodes = {
+                LocaleHelper.LANGUAGE_ENGLISH,
+                LocaleHelper.LANGUAGE_INDONESIAN
+        };
+
+        int checkedItem = currentLanguage.equals(LocaleHelper.LANGUAGE_INDONESIAN) ? 1 : 0;
+
+        builder.setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+            String selectedLanguage = languageCodes[which];
+
+            if (!selectedLanguage.equals(currentLanguage)) {
+                // Save and apply new language
+                LocaleHelper.setLocale(this, selectedLanguage);
+
+                // Show confirmation
+                Toast.makeText(this, R.string.language_changed, Toast.LENGTH_SHORT).show();
+
+                // Recreate activity to apply changes
+                dialog.dismiss();
+                recreate();
+            } else {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
     @Override
     protected void onResume() {
@@ -167,10 +250,8 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
         }
     }
 
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -206,7 +287,6 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
     }
 
     private void showFallDetectDialog() {
-
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_fall_detect, null);
 
@@ -242,8 +322,12 @@ public class V_HomePage extends AppCompatActivity implements SensorEventListener
 
     private void activateEmergencyService() {
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
-        smsIntent.setData(Uri.parse("smsto:000  "));
-        smsIntent.putExtra("sms_body", String.format("This is an emergency! Please help! The temperature currently is %.1f °C and light level is %.1f lux around here.", temperature, lightLevel));
+        smsIntent.setData(Uri.parse("smsto:000"));
+        smsIntent.putExtra("sms_body", String.format(
+                getString(R.string.emergency_sms_body),
+                temperature,
+                lightLevel
+        ));
         startActivity(smsIntent);
     }
 }

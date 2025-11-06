@@ -7,9 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import com.eldercare.eldercare.R;
 import com.eldercare.eldercare.databinding.ActivityFaceScanResultBinding;
+import com.eldercare.eldercare.view.BaseActivity;
+
 import java.util.ArrayList;
 
-public class FaceScanResultActivity extends AppCompatActivity {
+public class FaceScanResultActivity extends BaseActivity {
     private ActivityFaceScanResultBinding binding;
     private boolean isSuccess;
     private boolean isHealthy;
